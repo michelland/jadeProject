@@ -112,8 +112,10 @@ public class Planet extends Application {
             properties.setProperty(Profile.GUI, "true");
             Profile profile = new ProfileImpl(properties);
             AgentContainer mainContainer = runtime.createMainContainer(profile);
-            AgentController agentController=mainContainer.createNewAgent("Astero", "agent.Rover", new Object[]{});
-            agentController.start();
+            AgentController agent1=mainContainer.createNewAgent("Astero", "agent.Rover", new Object[]{});
+            AgentController agent2=mainContainer.createNewAgent("Rivero", "agent.Rover", new Object[]{});
+            agent1.start();
+            agent2.start();
             Application.launch(Planet.class);
         } catch (ControllerException e) {
             e.printStackTrace();
