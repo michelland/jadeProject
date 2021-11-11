@@ -1,19 +1,27 @@
+package agent;
+
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 
-public class Agent1 extends Agent {
+public class Rover extends Agent {
 
     protected String name;
 
-    public Agent1(String _name) {
-        super();
-        name = _name;
+
+    public String getNickname() {
+        return name;
     }
 
+    @Override
     protected void setup() {
+        name = this.getAID().getLocalName();
         sendMessage(this.getLocalName());
-        System.out.println(name);
+        System.out.println("Je suis " + name);
+    }
 
+    @Override
+    protected void takeDown() {
+        System.out.println("Destruction de " + name);
     }
 
     protected void sendMessage(String mess) {
