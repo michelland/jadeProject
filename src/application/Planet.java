@@ -1,10 +1,12 @@
 package application;
 
+import UI.App;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import world.Position;
 import world.Terrain;
 
 import jade.core.Profile;
@@ -33,15 +35,22 @@ public class Planet extends Application {
 
     /*************************** WORLD *****************************/
     public static Terrain terrain;
+    public static Position position = new Position(14,24);
 
     /**************************** UI *****************************/
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
     public GridPane grid;
 
+    public static App window;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         initUI(primaryStage);
+    }
+
+    public static Terrain getTerrain() {
+        return terrain;
     }
 
     public void initUI(Stage primaryStage) {
@@ -62,6 +71,7 @@ public class Planet extends Application {
 
     public static void InitTerrain() {
         terrain = new Terrain(SIZE, CRATER_RATE, SAMPLE_RATE);
+        //window = new App(getTerrain(), WIDTH, HEIGHT, SIZE);
         System.out.println(terrain.toString());
     }
 
@@ -107,6 +117,7 @@ public class Planet extends Application {
         try {
             InitTerrain();
 
+
             Runtime runtime = Runtime.instance();
             Properties properties = new ExtendedProperties();
             properties.setProperty(Profile.GUI, "true");
@@ -116,8 +127,24 @@ public class Planet extends Application {
             AgentController agent2=mainContainer.createNewAgent("Rivero", "agent.Rover", new Object[]{});
             agent1.start();
             agent2.start();
-            Application.launch(Planet.class);
-        } catch (ControllerException e) {
+
+            new Thread() {
+                @Override
+                public void run() {
+                    javafx.application.Application.launch(App.class);
+                }
+            }.start();
+            App startUpTest = App.waitForStartUpTest();
+            startUpTest.printSomething(terrain, WIDTH, HEIGHT, SIZE, position);
+            Thread.sleep(1000);
+            terrain.setType(Type.EMPTY, 0,0);
+            terrain.setType(Type.EMPTY, 1,0);
+            terrain.setType(Type.EMPTY, 2,0);
+            terrain.setType(Type.EMPTY, 3,0);
+            terrain.setType(Type.EMPTY, 4,0);
+            terrain.setType(Type.EMPTY, 5,0);
+            //Application.launch(Planet.class);
+        } catch (ControllerException | InterruptedException e) {
             e.printStackTrace();
         }
 
