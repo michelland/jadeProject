@@ -1,6 +1,6 @@
 package UI;
 
-import application.Planet;
+import world.Planet;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -64,7 +64,7 @@ public class App extends Application {
         HEIGHT = Planet.HEIGHT;
         SIZE = Planet.SIZE;
         pos = Planet.position;
-        System.out.println(terrain.toString());
+        //System.out.println(terrain.toString());
     }
 
     @Override
@@ -129,14 +129,14 @@ public class App extends Application {
                     rec.setFill(col);
                 }
                 grid.add(rec, j, i+1, 1, 1);
-                if (terrain.getType(i,j) == Type.CRATER) {
+                if (Planet.terrain.getType(i,j) == Type.CRATER) {
                     ImageView fissure = new ImageView("assets/fissure.png");
                     fissure.setPreserveRatio(true);
                     fissure.setFitWidth(len_square);
                     fissure.setFitHeight(len_square);
                     grid.add(fissure, j, i+1, 1,1);
                 }
-                if (terrain.getType(i,j) == Type.SAMPLE) {
+                if (Planet.terrain.getType(i,j) == Type.SAMPLE) {
                     ImageView sample = new ImageView("assets/sample.png");
                     sample.setPreserveRatio(true);
                     sample.setFitWidth(len_square/2);
