@@ -14,27 +14,11 @@ public class Rover extends Agent {
     protected int positionX;
     protected int positionY;
 
-
-    protected int i = 0;
-
-    public int getPositionX() {
-        return positionX;
-    }
-    public int getPositionY() {
-        return positionY;
-    }
-
-    public String getNickname() {
-        return name;
-    }
-
     @Override
     protected void setup() {
         name = this.getAID().getLocalName();
         positionX = 1;
         positionY = 1;
-
-
 
         addBehaviour(new CyclicBehaviour() {
 
@@ -42,7 +26,7 @@ public class Rover extends Agent {
             public void action() {
                 positionX++;
                 positionY++;
-                System.out.println("rover : je suis a la position " + positionX + "," + positionY);
+                System.out.println(name + " > je suis a la position " + positionX + "," + positionY);
                 sendPositionToPlanet();
                 try {
                     Thread.sleep(6000);
@@ -70,18 +54,15 @@ public class Rover extends Agent {
         System.out.println("Destruction de " + name);
     }
 
-    protected void sendMessage(String content) {
+    protected void sendMessage(String content, String dest) {
         ACLMessage message = new ACLMessage(ACLMessage.INFORM);
         message.setContent(content);
-        message.addReceiver(new AID("Planet", AID.ISLOCALNAME));
+        message.addReceiver(new AID(dest, AID.ISLOCALNAME));
         send(message);
     }
 
     public void sendPositionToPlanet() {
-        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
         String content = "" + positionX + "," + positionY;
-        message.setContent(content);
-        message.addReceiver(new AID("Planet",AID.ISLOCALNAME));
-        send(message);
+        sendMessage(content, "Planet");
     }
 }

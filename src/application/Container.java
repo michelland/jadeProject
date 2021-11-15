@@ -1,6 +1,5 @@
 package application;
 
-import UI.App;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
@@ -9,7 +8,6 @@ import jade.util.leap.Properties;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
-import world.Type;
 
 public class Container {
 
@@ -28,15 +26,12 @@ public class Container {
             agent1.start();
             //agent2.start();
 
-
             new Thread() {
                 @Override
                 public void run() {
                     javafx.application.Application.launch(App.class);
                 }
             }.start();
-            App application = App.waitForApp();
-            application.setupUI();
 
         } catch (ControllerException e) {
             e.printStackTrace();
