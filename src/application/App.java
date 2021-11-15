@@ -10,6 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import world.State;
 import world.Type;
 
 import java.util.Timer;
@@ -20,9 +21,9 @@ public class App extends Application {
 
 
     protected GridPane grid = new GridPane();
-    protected ImageView roverIcon;
+    protected ImageView[] roverIcons = new ImageView[Planet.nbagents];
     public Timer timer;
-    public int timePerFrame = 100;
+    public int timePerFrame = 10;
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -49,6 +50,7 @@ public class App extends Application {
 
     public void initUI(Stage primaryStage) {
         primaryStage.setTitle("App");
+
         HBox hbox = new HBox();
 
         drawGround();
@@ -67,21 +69,27 @@ public class App extends Application {
 
 
     public void refreshAgents() {
-        int x = Planet.position.getX();
-        int y = Planet.position.getY();
-        grid.getChildren().remove(roverIcon);
-        grid.add(roverIcon, y, x+1,1,1);
+
+        for (int i=0 ; i<Planet.nbagents ; i++) {
+            State state = Planet.states.get(i);
+            int x = state.getX();
+            int y = state.getY();
+            grid.getChildren().remove(roverIcons[i]);
+            grid.add(roverIcons[i], y, x+1, 1,1);
+        }
     }
 
     public void drawAgents() {
         int len_square = Planet.WIDTH / Planet.SIZE;
-        int x = Planet.position.getX();
-        int y = Planet.position.getY();
-        roverIcon = new ImageView("assets/rover.png");
-        roverIcon.setPreserveRatio(true);
-        roverIcon.setFitWidth(len_square/2);
-        roverIcon.setFitHeight(len_square/2);
-        grid.add(roverIcon, y, x+1, 1,1);
+        for (int i=0 ; i<Planet.nbagents ; i++) {
+            roverIcons[i] = new ImageView("assets/rover" + i + ".png");
+            roverIcons[i].setPreserveRatio(true);
+            roverIcons[i].setFitWidth(len_square/2.0);
+            roverIcons[i].setFitHeight(len_square/2.0);
+            int x = Planet.states.get(i).getX();
+            int y = Planet.states.get(i).getY();
+            grid.add(roverIcons[i], y, x+1, 1,1);
+        }
     }
 
     public void drawGround() {
@@ -93,17 +101,17 @@ public class App extends Application {
                 rec.setFill(col);
                 grid.add(rec, j, i+1, 1, 1);
                 if (Planet.terrain.getType(i,j) == Type.CRATER) {
-                    ImageView fissure = new ImageView("assets/fissure.png");
+                    ImageView fissure = new ImageView("assets/fissure3.png");
                     fissure.setPreserveRatio(true);
-                    fissure.setFitWidth(len_square);
-                    fissure.setFitHeight(len_square);
+                    fissure.setFitWidth(len_square/1.5);
+                    fissure.setFitHeight(len_square/1.5);
                     grid.add(fissure, j, i+1, 1,1);
                 }
                 if (Planet.terrain.getType(i,j) == Type.SAMPLE) {
                     ImageView sample = new ImageView("assets/sample.png");
                     sample.setPreserveRatio(true);
-                    sample.setFitWidth(len_square/2);
-                    sample.setFitHeight(len_square/2);
+                    sample.setFitWidth(len_square/2.0);
+                    sample.setFitHeight(len_square/2.0);
                     grid.add(sample, j, i+1, 1,1);
                 }
             }

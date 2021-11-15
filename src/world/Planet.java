@@ -4,6 +4,9 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class Planet extends Agent {
 
@@ -14,8 +17,9 @@ public class Planet extends Agent {
 
     /*************************** WORLD *****************************/
     public static Terrain terrain;
-    public static Position position = new Position(0,0);
-    //public static Map<String,State> states;
+    public static int nbagents = 5;
+    public static State state = new State(0,0);
+    public static Map<Integer,State> states = new HashMap<Integer, State>();
 
     /**************************** UI *****************************/
     public static final int WIDTH = 800;
@@ -24,19 +28,23 @@ public class Planet extends Agent {
     @Override
     protected void setup() {
         terrain = new Terrain(SIZE, CRATER_RATE, SAMPLE_RATE);
+        for (int i=0 ; i<nbagents ; i++) {
+            states.put(i, new State(0,0));
+        }
 
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
                 ACLMessage msg = receive();
                 if (msg != null) {
+                    int sender = Integer.parseInt(msg.getSender().getLocalName());
                     String[] coordinates = msg.getContent().split(",");
-                    position.setX(Integer.parseInt(coordinates[0]));
-                    position.setY(Integer.parseInt(coordinates[1]));
+                    states.get(sender).setX(Integer.parseInt(coordinates[0]));
+                    states.get(sender).setY(Integer.parseInt(coordinates[1]));
                     System.out.println(myAgent.getLocalName() +
-                            " > Rover a la position " + position.getX() + "," + position.getY());
+                            " > Rover " + sender + " a la position " + states.get(sender).getX() + "," + states.get(sender).getY());
                 }
-                block();
+                //block();
             }
         });
     }

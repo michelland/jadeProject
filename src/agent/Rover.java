@@ -6,33 +6,40 @@ import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
+import javafx.util.Pair;
+import world.Planet;
 import world.Position;
+import world.State;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
 
 public class Rover extends Agent {
 
     protected String name;
-    protected int positionX;
-    protected int positionY;
+    protected State state;
 
     @Override
     protected void setup() {
         name = this.getAID().getLocalName();
-        positionX = 1;
-        positionY = 1;
+        int x = (int) (Math.random() * (Planet.SIZE-5));
+        int y = (int) (Math.random() * (Planet.SIZE-5));
+        state = new State(x,y);
 
         addBehaviour(new CyclicBehaviour() {
 
             @Override
             public void action() {
-                positionX++;
-                positionY++;
-                System.out.println(name + " > je suis a la position " + positionX + "," + positionY);
-                sendPositionToPlanet();
                 try {
-                    Thread.sleep(6000);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                moveRandom();
+                System.out.println(name + " > je suis a la position " + state.getX() + "," + state.getY());
+                sendPositionToPlanet();
             }
         });
 
@@ -43,7 +50,7 @@ public class Rover extends Agent {
                 if (msg != null) {
                     System.out.println(myAgent.getLocalName() + ":" + msg.getContent());
                 }
-                block();
+                //block();
             }
         });
 
@@ -62,7 +69,15 @@ public class Rover extends Agent {
     }
 
     public void sendPositionToPlanet() {
-        String content = "" + positionX + "," + positionY;
+        String content = "" + state.getX() + "," + state.getY();
         sendMessage(content, "Planet");
+    }
+
+    public void moveRandom() {
+        Position current = new Position(state.getX(),state.getY());
+        Vector<Position> possible_positions = current.legalPositions();
+        int index = (int) (Math.random() * (possible_positions.size()));
+        state.setX(possible_positions.get(index).x);
+        state.setY(possible_positions.get(index).y);
     }
 }
