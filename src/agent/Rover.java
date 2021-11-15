@@ -6,12 +6,14 @@ import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
+import world.Position;
 
 public class Rover extends Agent {
 
     protected String name;
     protected int positionX;
     protected int positionY;
+
 
     protected int i = 0;
 
@@ -29,18 +31,21 @@ public class Rover extends Agent {
     @Override
     protected void setup() {
         name = this.getAID().getLocalName();
-        positionX = 0;
+        positionX = 1;
         positionY = 1;
+
+
 
         addBehaviour(new CyclicBehaviour() {
 
             @Override
             public void action() {
-                String content = Integer.toString(i);
-                i++;
-                sendMessage(content);
+                positionX++;
+                positionY++;
+                System.out.println("rover : je suis a la position " + positionX + "," + positionY);
+                sendPositionToPlanet();
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(6000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -69,6 +74,14 @@ public class Rover extends Agent {
         ACLMessage message = new ACLMessage(ACLMessage.INFORM);
         message.setContent(content);
         message.addReceiver(new AID("Planet", AID.ISLOCALNAME));
+        send(message);
+    }
+
+    public void sendPositionToPlanet() {
+        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+        String content = "" + positionX + "," + positionY;
+        message.setContent(content);
+        message.addReceiver(new AID("Planet",AID.ISLOCALNAME));
         send(message);
     }
 }

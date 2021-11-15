@@ -23,10 +23,10 @@ public class Container {
             AgentContainer mainContainer = runtime.createMainContainer(profile);
             AgentController planet = mainContainer.createNewAgent("Planet", "world.Planet", new Object[]{});
             AgentController agent1=mainContainer.createNewAgent("Astero", "agent.Rover", new Object[]{});
-            AgentController agent2=mainContainer.createNewAgent("Rivero", "agent.Rover", new Object[]{});
+            //AgentController agent2=mainContainer.createNewAgent("Rivero", "agent.Rover", new Object[]{});
             planet.start();
             agent1.start();
-            agent2.start();
+            //agent2.start();
 
 
             new Thread() {

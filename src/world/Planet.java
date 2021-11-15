@@ -39,7 +39,7 @@ public class Planet extends Agent {
 
     /*************************** WORLD *****************************/
     public static Terrain terrain;
-    public static Position position = new Position(14,24);
+    public static Position position = new Position(0,0);
     public static int i = 0;
 
     /**************************** UI *****************************/
@@ -55,17 +55,12 @@ public class Planet extends Agent {
             public void action() {
                 ACLMessage msg = receive();
                 if (msg != null) {
-                    System.out.println(myAgent.getLocalName() + ":" + msg.getContent());
-                    if (msg.getContent().equals("10")) {
-                        System.out.println("update terrain");
-                        terrain.setType(Type.CRATER, 1,0);
-                        terrain.setType(Type.CRATER, 2,0);
-                        terrain.setType(Type.CRATER, 3,0);
-                        terrain.setType(Type.CRATER, 4,0);
-                        terrain.setType(Type.CRATER, 5,0);
-                    }
+                    String[] coordinates = msg.getContent().split(",");
+                    position.setX(Integer.parseInt(coordinates[0]));
+                    position.setY(Integer.parseInt(coordinates[1]));
+                    System.out.println(myAgent.getLocalName() +
+                            " : rover a la position :" + position.getX() + "," + position.getY());
                 }
-
                 block();
             }
         });

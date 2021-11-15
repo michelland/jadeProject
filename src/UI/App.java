@@ -31,12 +31,13 @@ public class App extends Application {
     protected Position pos;
     protected GridPane grid = new GridPane();
     protected int position;
+    protected ImageView rover;
 
     public static final CountDownLatch latch = new CountDownLatch(1);
     public static App application = null;
 
     public Timer timer;
-    public int timePerFrame = 1000;
+    public int timePerFrame = 100;
 
     public static App waitForApp() {
         try {
@@ -77,9 +78,7 @@ public class App extends Application {
             //@Override
             public void run() {
                 Platform.runLater(() -> {
-
                     updateUI();
-
                 });
             }
 
@@ -96,6 +95,7 @@ public class App extends Application {
 
 
         drawGround();
+        drawAgents();
 
         hbox.getChildren().add(grid);
         Scene scene = new Scene(hbox,WIDTH,HEIGHT);
@@ -105,11 +105,28 @@ public class App extends Application {
 
     public void updateUI() {
 
-        drawGround();
+        refreshAgents();
     }
 
     public void addPosition(int sum) {
         position += sum;
+    }
+
+    public void refreshAgents() {
+        int x = Planet.position.getX();
+        int y = Planet.position.getY();
+        grid.getChildren().remove(rover);
+        grid.add(rover, y, x+1,1,1);
+    }
+    public void drawAgents() {
+        int len_square = WIDTH / SIZE;
+        int x = Planet.position.getX();
+        int y = Planet.position.getY();
+        rover = new ImageView("assets/rover.png");
+        rover.setPreserveRatio(true);
+        rover.setFitWidth(len_square/2);
+        rover.setFitHeight(len_square/2);
+        grid.add(rover, y, x+1, 1,1);
     }
 
     public void drawGround() {
