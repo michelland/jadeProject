@@ -134,8 +134,8 @@ public class Planet extends Application {
                     javafx.application.Application.launch(App.class);
                 }
             }.start();
-            App startUpTest = App.waitForStartUpTest();
-            startUpTest.printSomething(terrain, WIDTH, HEIGHT, SIZE, position);
+            App application = App.waitForApp();
+            application.setupUI();
             Thread.sleep(1000);
             terrain.setType(Type.EMPTY, 0,0);
             terrain.setType(Type.EMPTY, 1,0);

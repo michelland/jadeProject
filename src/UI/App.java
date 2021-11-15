@@ -30,65 +30,47 @@ public class App extends Application {
     protected Terrain terrain;
     protected Position pos;
     protected GridPane grid = new GridPane();
-    protected Label label1;
     protected int position;
 
     public static final CountDownLatch latch = new CountDownLatch(1);
-    public static App startUpTest = null;
+    public static App application = null;
 
     public Timer timer;
     public int timePerFrame = 1000;
 
-    public static App waitForStartUpTest() {
+    public static App waitForApp() {
         try {
             latch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return startUpTest;
+        return application;
     }
 
-    public static void setStartUpTest(App startUpTest0) {
-        startUpTest = startUpTest0;
+    public static void setUpApp(App startUpTest0) {
+        application = startUpTest0;
         latch.countDown();
     }
 
     public App() {
-        setStartUpTest(this);
+        setUpApp(this);
     }
 
-    public void printSomething(Terrain t, int weight, int height, int size, Position position) {
-        terrain = t;
-        WIDTH = weight;
-        HEIGHT = height;
-        SIZE = size;
-        pos = position;
-        label1 = new Label("hello");
+
+    public void setupUI() {
+
+        terrain = Planet.getTerrain();
+        WIDTH = Planet.WIDTH;
+        HEIGHT = Planet.HEIGHT;
+        SIZE = Planet.SIZE;
+        pos = Planet.position;
         System.out.println(terrain.toString());
     }
-
-
-
-
-//    public App(Terrain t, int weight, int height, int size) {
-//        super();
-//        terrain = t;
-//        WIDTH = weight;
-//        HEIGHT = height;
-//        SIZE = size;
-//    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         initUI(primaryStage);
-//        BorderPane pane = new BorderPane();
-//        Scene scene = new Scene(pane, 500, 500);
-//        primaryStage.setScene(scene);
 //
-//        Label label = new Label("Hello");
-//        pane.setCenter(label);
-//
-//        primaryStage.show();
         timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
 
@@ -110,15 +92,12 @@ public class App extends Application {
 
     public void initUI(Stage primaryStage) {
         primaryStage.setTitle("App");
-
-        label1 = new Label(terrain.toString());
-        Button button1 = new Button("click me");
         HBox hbox = new HBox();
 
 
         drawGround();
 
-        hbox.getChildren().add(label1);
+        hbox.getChildren().add(grid);
         Scene scene = new Scene(hbox,WIDTH,HEIGHT);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -126,11 +105,7 @@ public class App extends Application {
 
     public void updateUI() {
 
-        //position = p;
-        //System.out.println(position);
-        position ++;
-        label1.setText(terrain.toString());
-        //drawGround();
+        drawGround();
     }
 
     public void addPosition(int sum) {
@@ -138,7 +113,6 @@ public class App extends Application {
     }
 
     public void drawGround() {
-        System.out.println("coucou je draw");
         int len_square = WIDTH / SIZE;
         Color col = new Color(0.82,0.26,0.07,1.0);
         int color = 0;
