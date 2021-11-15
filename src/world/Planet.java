@@ -15,6 +15,7 @@ public class Planet extends Agent {
     /*************************** WORLD *****************************/
     public static Terrain terrain;
     public static Position position = new Position(0,0);
+    //public static Map<String,State> states;
 
     /**************************** UI *****************************/
     public static final int WIDTH = 800;
