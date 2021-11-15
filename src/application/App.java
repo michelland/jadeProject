@@ -22,6 +22,9 @@ public class App extends Application {
 
     protected GridPane grid = new GridPane();
     protected ImageView[] roverIcons = new ImageView[Planet.nbagents];
+    Color colNight = new Color(0.25,0,0.9,1.0);
+    Color colDay = new Color(0.82,0.26,0.07,1.0);
+    public boolean currentDayLightState = Planet.dayLight;
     public Timer timer;
     public int timePerFrame = 10;
 
@@ -50,7 +53,6 @@ public class App extends Application {
 
     public void initUI(Stage primaryStage) {
         primaryStage.setTitle("App");
-
         HBox hbox = new HBox();
 
         drawGround();
@@ -64,11 +66,14 @@ public class App extends Application {
 
     public void updateUI() {
 
-        refreshAgents();
+        updateAgents();
+        updateLight();
+
     }
 
 
-    public void refreshAgents() {
+
+    public void updateAgents() {
 
         for (int i=0 ; i<Planet.nbagents ; i++) {
             State state = Planet.states.get(i);
@@ -79,6 +84,16 @@ public class App extends Application {
         }
     }
 
+    public void updateLight() {
+
+        if (Planet.dayLight != currentDayLightState) {
+            currentDayLightState = Planet.dayLight;
+            grid.getChildren().removeAll();
+            drawGround();
+            drawAgents();
+        }
+    }
+
     public void drawAgents() {
         int len_square = Planet.WIDTH / Planet.SIZE;
         for (int i=0 ; i<Planet.nbagents ; i++) {
@@ -86,6 +101,7 @@ public class App extends Application {
             roverIcons[i].setPreserveRatio(true);
             roverIcons[i].setFitWidth(len_square/2.0);
             roverIcons[i].setFitHeight(len_square/2.0);
+
             int x = Planet.states.get(i).getX();
             int y = Planet.states.get(i).getY();
             grid.add(roverIcons[i], y, x+1, 1,1);
@@ -94,7 +110,13 @@ public class App extends Application {
 
     public void drawGround() {
         int len_square = Planet.WIDTH / Planet.SIZE;
-        Color col = new Color(0.82,0.26,0.07,1.0);
+        Color col;
+        if (Planet.dayLight) {
+            col = colDay;
+        }
+        else {
+            col = colNight;
+        }
         for (int i=0 ; i<Planet.SIZE ; i++) {
             for (int j=0 ; j<Planet.SIZE ; j++) {
                 Rectangle rec = new Rectangle(len_square,len_square);

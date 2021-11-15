@@ -17,9 +17,12 @@ public class Planet extends Agent {
 
     /*************************** WORLD *****************************/
     public static Terrain terrain;
+    public static boolean dayLight = false;
     public static int nbagents = 5;
     public static State state = new State(0,0);
     public static Map<Integer,State> states = new HashMap<Integer, State>();
+
+    public static int time = 0;
 
     /**************************** UI *****************************/
     public static final int WIDTH = 800;
@@ -31,6 +34,21 @@ public class Planet extends Agent {
         for (int i=0 ; i<nbagents ; i++) {
             states.put(i, new State(0,0));
         }
+        addBehaviour(new CyclicBehaviour() {
+            @Override
+            public void action() {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                time++;
+                if (time % 100 == 0) {
+                    dayLight = !dayLight;
+                }
+                //block();
+            }
+        });
 
         addBehaviour(new CyclicBehaviour() {
             @Override
