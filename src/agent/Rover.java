@@ -8,8 +8,9 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import javafx.util.Pair;
 import world.Planet;
-import world.Position;
-import world.State;
+import agent.Position;
+import agent.State;
+import world.Type;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class Rover extends Agent {
         int x = (int) (Math.random() * (Planet.SIZE-5));
         int y = (int) (Math.random() * (Planet.SIZE-5));
         state = new State(x,y);
+        state.setStatus(Status.RUNNING);
 
         addBehaviour(new CyclicBehaviour() {
 
@@ -69,15 +71,27 @@ public class Rover extends Agent {
     }
 
     public void sendPositionToPlanet() {
-        String content = "" + state.getX() + "," + state.getY();
+        String content = "position:" + state.getX() + "," + state.getY();
+        sendMessage(content, "Planet");
+    }
+
+    public void sendHSToPlanet() {
+        String content = "hs: ";
         sendMessage(content, "Planet");
     }
 
     public void moveRandom() {
-        Position current = new Position(state.getX(),state.getY());
-        Vector<Position> possible_positions = current.legalPositions();
-        int index = (int) (Math.random() * (possible_positions.size()));
-        state.setX(possible_positions.get(index).x);
-        state.setY(possible_positions.get(index).y);
+        if (!state.isHS()) {
+            Position current = new Position(state.getX(),state.getY());
+            Vector<Position> possible_positions = current.legalPositions();
+            int index = (int) (Math.random() * (possible_positions.size()));
+            state.setX(possible_positions.get(index).x);
+            state.setY(possible_positions.get(index).y);
+            if (Planet.terrain.getType(state.getX(),state.getY()) == Type.CRATER) {
+                state.setHS(true);
+                state.setStatus(Status.HS);
+                sendHSToPlanet();
+            }
+        }
     }
 }

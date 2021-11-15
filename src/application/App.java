@@ -10,7 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import world.State;
+import agent.State;
 import world.Type;
 
 import java.util.Timer;
@@ -22,6 +22,7 @@ public class App extends Application {
 
     protected GridPane grid = new GridPane();
     protected ImageView[] roverIcons = new ImageView[Planet.nbagents];
+    protected ImageView[] hsroverIcons = new ImageView[Planet.nbagents];
     Color colNight = new Color(0.25,0,0.9,1.0);
     Color colDay = new Color(0.82,0.26,0.07,1.0);
     public boolean currentDayLightState = Planet.dayLight;
@@ -80,7 +81,14 @@ public class App extends Application {
             int x = state.getX();
             int y = state.getY();
             grid.getChildren().remove(roverIcons[i]);
-            grid.add(roverIcons[i], y, x+1, 1,1);
+            grid.getChildren().remove(hsroverIcons[i]);
+
+            if (Planet.states.get(i).isHS()) {
+                grid.add(hsroverIcons[i], y, x+1, 1,1);
+            }
+            else {
+                grid.add(roverIcons[i], y, x+1, 1,1);
+            }
         }
     }
 
@@ -102,9 +110,20 @@ public class App extends Application {
             roverIcons[i].setFitWidth(len_square/2.0);
             roverIcons[i].setFitHeight(len_square/2.0);
 
+            hsroverIcons[i] = new ImageView("assets/hsrover" + i + ".png");
+            hsroverIcons[i].setPreserveRatio(true);
+            hsroverIcons[i].setFitWidth(len_square/2.0);
+            hsroverIcons[i].setFitHeight(len_square/2.0);
+
             int x = Planet.states.get(i).getX();
             int y = Planet.states.get(i).getY();
-            grid.add(roverIcons[i], y, x+1, 1,1);
+
+            if (Planet.states.get(i).isHS()) {
+                grid.add(hsroverIcons[i], y, x+1, 1,1);
+            }
+            else {
+                grid.add(roverIcons[i], y, x+1, 1,1);
+            }
         }
     }
 

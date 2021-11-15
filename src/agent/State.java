@@ -1,10 +1,11 @@
-package world;
+package agent;
 
 public class State {
 
     protected int x;
     protected int y;
     protected boolean hs;
+    protected Status status;
 
     public State(int _x,int _y) {
         x = _x;
@@ -19,11 +20,15 @@ public class State {
         y = _y;
     }
     public void setHS(boolean b) { hs = b;}
+    public void setStatus(Status s) { status = s;}
     public int getX() {
         return x;
     }
     public int getY() {
         return y;
     }
-    public boolean isHS() { return hs;}
+    public boolean isHS() {
+        return status==Status.HS;
+    }
+    public Status getStatus() { return status; }
 }

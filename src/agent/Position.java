@@ -1,4 +1,6 @@
-package world;
+package agent;
+
+import world.Planet;
 
 import java.util.Vector;
 
@@ -26,7 +28,7 @@ public class Position {
     }
 
     public boolean isLegalPosition() {
-        return (x>=0 & x<Planet.SIZE & y>=0 & y<Planet.SIZE);
+        return (x>=0 & x< Planet.SIZE & y>=0 & y<Planet.SIZE);
     }
 
     public Vector<Position> legalPositions() {

@@ -1,5 +1,7 @@
 package world;
 
+import agent.State;
+import agent.Status;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -20,7 +22,7 @@ public class Planet extends Agent {
     public static boolean dayLight = false;
     public static int nbagents = 5;
     public static State state = new State(0,0);
-    public static Map<Integer,State> states = new HashMap<Integer, State>();
+    public static Map<Integer, State> states = new HashMap<Integer, State>();
 
     public static int time = 0;
 
@@ -56,11 +58,22 @@ public class Planet extends Agent {
                 ACLMessage msg = receive();
                 if (msg != null) {
                     int sender = Integer.parseInt(msg.getSender().getLocalName());
-                    String[] coordinates = msg.getContent().split(",");
-                    states.get(sender).setX(Integer.parseInt(coordinates[0]));
-                    states.get(sender).setY(Integer.parseInt(coordinates[1]));
-                    System.out.println(myAgent.getLocalName() +
-                            " > Rover " + sender + " a la position " + states.get(sender).getX() + "," + states.get(sender).getY());
+                    String[] message = msg.getContent().split(":");
+                    String type = message[0];
+                    String content = message[1];
+                    switch (type) {
+                        case "position":
+                            String[] coordinates = content.split(",");
+                            states.get(sender).setX(Integer.parseInt(coordinates[0]));
+                            states.get(sender).setY(Integer.parseInt(coordinates[1]));
+                            System.out.println(myAgent.getLocalName() +
+                                    " > Rover " + sender + " a la position " + states.get(sender).getX() + "," + states.get(sender).getY());
+                            break;
+                        case "hs":
+                            states.get(sender).setHS(true);
+                            states.get(sender).setStatus(Status.HS);
+                            break;
+                    }
                 }
                 //block();
             }
