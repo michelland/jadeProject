@@ -20,15 +20,15 @@ public class Planet extends Agent {
     /*************************** WORLD *****************************/
     public static Terrain terrain;
     public static boolean dayLight = false;
-    public static int nbagents = 5;
+    public static int nbagents = 6;
     public static State state = new State(0,0);
     public static Map<Integer, State> states = new HashMap<Integer, State>();
 
     public static int time = 0;
 
     /**************************** UI *****************************/
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 800;
+    public static final int WIDTH = 600;
+    public static final int HEIGHT = 600;
 
     @Override
     protected void setup() {
@@ -66,8 +66,8 @@ public class Planet extends Agent {
                             String[] coordinates = content.split(",");
                             states.get(sender).setX(Integer.parseInt(coordinates[0]));
                             states.get(sender).setY(Integer.parseInt(coordinates[1]));
-                            System.out.println(myAgent.getLocalName() +
-                                    " > Rover " + sender + " a la position " + states.get(sender).getX() + "," + states.get(sender).getY());
+                            //System.out.println(myAgent.getLocalName() +
+                            //        " > Rover " + sender + " a la position " + states.get(sender).getX() + "," + states.get(sender).getY());
                             break;
                         case "hs":
                             states.get(sender).setHS(true);

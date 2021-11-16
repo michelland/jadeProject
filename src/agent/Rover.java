@@ -25,8 +25,8 @@ public class Rover extends Agent {
     @Override
     protected void setup() {
         name = this.getAID().getLocalName();
-        int x = (int) (Math.random() * (Planet.SIZE-5));
-        int y = (int) (Math.random() * (Planet.SIZE-5));
+        int x = (int) (Math.random() * (Planet.SIZE));
+        int y = (int) (Math.random() * (Planet.SIZE));
         state = new State(x,y);
         state.setStatus(Status.RUNNING);
 
@@ -40,8 +40,8 @@ public class Rover extends Agent {
                     e.printStackTrace();
                 }
                 moveRandom();
-                System.out.println(name + " > je suis a la position " + state.getX() + "," + state.getY());
-                sendPositionToPlanet();
+
+
             }
         });
 
@@ -73,11 +73,13 @@ public class Rover extends Agent {
     public void sendPositionToPlanet() {
         String content = "position:" + state.getX() + "," + state.getY();
         sendMessage(content, "Planet");
+        System.out.println(name + " > je suis a la position " + state.getX() + "," + state.getY());
     }
 
     public void sendHSToPlanet() {
         String content = "hs: ";
         sendMessage(content, "Planet");
+        System.out.println(name + " > je suis HS");
     }
 
     public void moveRandom() {
@@ -87,6 +89,7 @@ public class Rover extends Agent {
             int index = (int) (Math.random() * (possible_positions.size()));
             state.setX(possible_positions.get(index).x);
             state.setY(possible_positions.get(index).y);
+            sendPositionToPlanet();
             if (Planet.terrain.getType(state.getX(),state.getY()) == Type.CRATER) {
                 state.setHS(true);
                 state.setStatus(Status.HS);

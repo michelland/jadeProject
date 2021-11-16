@@ -53,7 +53,7 @@ public class App extends Application {
 
 
     public void initUI(Stage primaryStage) {
-        primaryStage.setTitle("App");
+        primaryStage.setTitle("Planet");
         HBox hbox = new HBox();
 
         drawGround();
@@ -104,13 +104,20 @@ public class App extends Application {
 
     public void drawAgents() {
         int len_square = Planet.WIDTH / Planet.SIZE;
+
         for (int i=0 ; i<Planet.nbagents ; i++) {
-            roverIcons[i] = new ImageView("assets/rover" + i + ".png");
+            if (Planet.nbagents <= 6) {
+                roverIcons[i] = new ImageView("assets/rover" + i + ".png");
+                hsroverIcons[i] = new ImageView("assets/hsrover" + i + ".png");
+            }
+            else {
+                roverIcons[i] = new ImageView("assets/rover0.png");
+                hsroverIcons[i] = new ImageView("assets/hsrover0.png");
+            }
             roverIcons[i].setPreserveRatio(true);
             roverIcons[i].setFitWidth(len_square/2.0);
             roverIcons[i].setFitHeight(len_square/2.0);
 
-            hsroverIcons[i] = new ImageView("assets/hsrover" + i + ".png");
             hsroverIcons[i].setPreserveRatio(true);
             hsroverIcons[i].setFitWidth(len_square/2.0);
             hsroverIcons[i].setFitHeight(len_square/2.0);
