@@ -1,9 +1,14 @@
 package world;
 
+import agent.Rover;
 import agent.State;
 import agent.Status;
+import bdi.Decision_Process;
+import bdi.Filter;
+import bdi.Plans;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 
 import java.util.HashMap;
@@ -19,9 +24,12 @@ public class Planet extends Agent {
 
     /*************************** WORLD *****************************/
     public static Terrain terrain;
-    public static boolean dayLight = false;
+    public static boolean dayLight = true;
     public static int heure = 0;
-    public static int nbagents = 6;
+    public static int heureNuit = 18;
+    public static int heureJour = 0;
+    public static int timerTick = 1000;
+    public static int nbagents = 3;
     public static State state = new State(0,0);
     public static Map<Integer, State> states = new HashMap<Integer, State>();
 
@@ -31,25 +39,29 @@ public class Planet extends Agent {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
 
+    /**************************** AGENT *****************************/
+    public static final int rechargeEfficiency = 10;
+    public static final int dechargeEfficiency = 10;
+    public static final int numberOfSampleNecessaryForAnalysis = 4;
+    public static final int gatherVariance = 3;
+
     @Override
     protected void setup() {
         terrain = new Terrain(SIZE, CRATER_RATE, SAMPLE_RATE);
         for (int i=0 ; i<nbagents ; i++) {
             states.put(i, new State(0,0));
         }
-        addBehaviour(new CyclicBehaviour() {
+
+        addBehaviour(new TickerBehaviour(this, timerTick) {
             @Override
-            public void action() {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            public void onTick() {
+                heure = (heure + 1) % 24;
+                if (heure == heureNuit) {
+                    dayLight = false;
                 }
-                time++;
-                if (time % 100 == 0) {
-                    dayLight = !dayLight;
+                else if (heure == heureJour){
+                    dayLight = true;
                 }
-                //block();
             }
         });
 

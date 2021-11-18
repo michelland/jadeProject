@@ -1,15 +1,16 @@
 package agent;
 
-import bdi.Intention;
+import bdi.*;
+import com.sun.xml.internal.bind.v2.TODO;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import world.Planet;
 import world.Type;
-import bdi.Beliefs;
-import bdi.Desire;
 
 import java.util.Vector;
 
@@ -43,35 +44,24 @@ public class Rover extends Agent {
     protected void setup() {
         int x = (int) (Math.random() * (Planet.SIZE));
         int y = (int) (Math.random() * (Planet.SIZE));
-        beliefs = new Beliefs(this.getAID().getLocalName(),x,y);
+        beliefs = new Beliefs(this.getAID().getLocalName(), x, y);
+        desire = Desire.PROGRESS;
+        intention = Intention.EXPLORING;
 
-
-
-        /*addBehaviour(new CyclicBehaviour() {
-
+        addBehaviour(new TickerBehaviour(this, 1000) {
             @Override
-            public void action() {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                moveRandom();
+            public void onTick() {
 
-
-            }
-        });
-
-        addBehaviour(new CyclicBehaviour() {
-            @Override
-            public void action() {
-                ACLMessage msg = receive();
-                if (msg != null) {
-                    System.out.println(myAgent.getLocalName() + ":" + msg.getContent());
-                }
+                System.out.println(getX_mayday());
+                System.out.println(getY_mayday());
+                perception();
+                intention = Decision_Process.option(desire, intention, (Rover) this.myAgent);
+                desire = Decision_Process.des(desire, intention, (Rover) this.myAgent);
+                intention = Filter.filter(desire, intention, (Rover) this.myAgent);
+                Plans.execute(intention, (Rover) this.myAgent);
                 //block();
             }
-        });*/
+        });
         // update beliefs
         // compute next intentions
         //compue the desir
@@ -83,21 +73,25 @@ public class Rover extends Agent {
 
 
     }
-    private class startBehaviour extends OneShotBehaviour {
-
-        @Override
-        public void action() {
-            System.out.println("c'est parti");
+    //TODO ecrire fonction qui reçoit message, et l'appeler au début de perception
+    public void receiveMayday() {
+        ACLMessage msg = receive();
+        if (msg != null) {
+            String message = msg.getContent();
+            String[] parsed_message = message.split("-");
+            String type = parsed_message[0];
+            String content = parsed_message[1];
+            if (type.equals("mayday")) {
+                String[] coordinates = content.split(",");
+                beliefs.setX_mayday(Integer.parseInt(coordinates[0]));
+                beliefs.setY_mayday(Integer.parseInt(coordinates[1]));
+            }
         }
     }
 
     public void perception() {
-        beliefs.setCurrentType(Planet.terrain.getType(getX(),getY()));
-        ACLMessage msg = receive();
-        if (msg != null) {
-            setMsg(msg);
-            System.out.println(getName() + ":" + msg.getContent());
-        }
+        beliefs.setCurrentType(Planet.terrain.getType(getX(), getY()));
+        receiveMayday();
         setHeure(Planet.heure);
     }
 
@@ -113,32 +107,98 @@ public class Rover extends Agent {
         send(message);
     }
 
+
     public void sendPositionToPlanet() {
         String content = "position:" + getX() + "," + getY();
         sendMessage(content, "Planet");
-        System.out.println(getName() + " > je suis a la position " + getX() + "," + getY());
+        //System.out.println(getName() + " > je suis a la position " + getX() + "," + getY());
     }
 
     public void sendHSToPlanet() {
         String content = "hs: ";
         sendMessage(content, "Planet");
-        System.out.println(getName() + " > je suis HS");
+        //System.out.println(getName() + " > je suis HS");
     }
 
     public void moveRandom() {
-        if (!isHS()) {
-            Position current = new Position(getX(),getY());
-            Vector<Position> possible_positions = current.legalPositions();
-            int index = (int) (Math.random() * (possible_positions.size()));
-            setX(possible_positions.get(index).x);
-            setY(possible_positions.get(index).y);
+        Position current = new Position(getX(), getY());
+        Vector<Position> possible_positions = current.legalPositions();
+        int index = (int) (Math.random() * (possible_positions.size()));
+        move(possible_positions.get(index).x, possible_positions.get(index).y);
+    }
+
+    public void move(int _x, int _y) {
+        if (!isHS() && batteryRemaining()) {
+            setX(_x);
+            setY(_y);
             sendPositionToPlanet();
-            if (Planet.terrain.getType(getX(),getY()) == Type.CRATER) {
+            if (Planet.terrain.getType(getX(), getY()) == Type.CRATER) {
                 setStatus(Status.HS);
                 sendHSToPlanet();
             }
+            decharge();
         }
     }
+
+
+    public boolean batteryRemaining() {
+        return getBattery_pourcentage() >= 10;
+    }
+
+    public void recharge() {
+        if (Planet.dayLight) {
+            int percentage = beliefs.getBattery_pourcentage();
+            if (percentage < 100) {
+                beliefs.setBattery_pourcentage((percentage + Planet.rechargeEfficiency) % 100);
+            }
+        }
+    }
+
+    public void decharge() {
+        if (batteryRemaining()) {
+            int percentage = beliefs.getBattery_pourcentage();
+            beliefs.setBattery_pourcentage((percentage - Planet.dechargeEfficiency));
+        }
+    }
+
+
+    public void gather() {
+        if (Planet.terrain.getType(getX(), getY()).equals(Type.SAMPLE)) {
+            int sample_size = (int) ((Math.random() * (Planet.gatherVariance - 1)) + 1);
+            beliefs.setNb_sample(getNb_sample() + sample_size);
+            Planet.terrain.removeSample(getX(), getY());
+        }
+        decharge();
+    }
+
+    public void analysing() {
+        int number_of_sample = beliefs.getNb_sample();
+        if (number_of_sample >= Planet.numberOfSampleNecessaryForAnalysis) {
+            beliefs.setNb_sample(number_of_sample - Planet.numberOfSampleNecessaryForAnalysis);
+            System.out.println("Analyse réussit");
+        } else {
+            System.out.println("Analyse échouée");
+        }
+        decharge();
+    }
+
+    public void moveToMayday() {
+        int diffX = getX() - getBeliefs().getX_mayday();
+        int diffY = getY() - getBeliefs().getY_mayday();
+
+        if (diffX < 0) {
+            move(getX() - 1, getY());
+        }
+        else if (diffX > 0) {
+            move(getX() + 1, getY());
+        }
+        if (diffY < 0) {
+            move(getX(), getY() - 1);
+        }
+        else if (diffY > 0) {
+            move(getX(), getY() + 1);
+        }
+        decharge();
+    }
+
 }
-
-

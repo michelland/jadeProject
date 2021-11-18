@@ -10,7 +10,7 @@ public class Filter {
 
     }
 
-    public Intention filter(Desire _d, Intention _i, Rover _r){
+    public static Intention filter(Desire _d, Intention _i, Rover _r){
         Intention new_intention = option(_d, _i, _r);
         Desire new_desire = des(_d, _i, _r);
 

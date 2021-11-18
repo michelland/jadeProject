@@ -68,7 +68,11 @@ public class Beliefs {
             return x;
         }
 
-        public Status getStatus() {
+    public void setX_mayday(int x_mayday) { this.x_mayday = x_mayday; }
+
+    public void setY_mayday(int y_mayday) { this.y_mayday = y_mayday; }
+
+    public Status getStatus() {
             return status;
         }
 

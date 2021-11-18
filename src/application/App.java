@@ -26,6 +26,7 @@ public class App extends Application {
     Color colNight = new Color(0.25,0,0.9,1.0);
     Color colDay = new Color(0.82,0.26,0.07,1.0);
     public boolean currentDayLightState = Planet.dayLight;
+    public int currentNumberOfSamples = getNumberOfSample();
     public Timer timer;
     public int timePerFrame = 10;
 
@@ -67,11 +68,35 @@ public class App extends Application {
 
     public void updateUI() {
 
+        updateSamples();
         updateAgents();
         updateLight();
 
+
     }
 
+    public int getNumberOfSample() {
+        int res = 0;
+        for (int i=0 ; i<Planet.SIZE ; i++) {
+            for (int j = 0; j < Planet.SIZE; j++) {
+                if (Planet.terrain.getType(i, j).equals(Type.SAMPLE)) {
+                    res++;
+                }
+            }
+        }
+        return res;
+    }
+
+    public void updateSamples() {
+
+        int numberOfSample = getNumberOfSample();
+        if (numberOfSample < currentNumberOfSamples) {
+            currentNumberOfSamples = numberOfSample;
+            grid.getChildren().removeAll();
+            drawGround();
+            drawAgents();
+        }
+    }
 
 
     public void updateAgents() {

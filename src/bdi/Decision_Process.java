@@ -38,13 +38,11 @@ public class Decision_Process {
 
     public static Desire des (Desire _d, Intention _i, Rover _r){
         if(_d == Desire.PROGRESS){
-            String message = _r.getMsg().getContent();
-            String[] parsed_message = message.split("-");
-            if(parsed_message[0] == "mayday" && _i != Intention.RECHARGING){
-                return Desire.HELP;
-            }
-            else{
+            if(_r.getX_mayday() == -1 && _r.getY_mayday() == -1){
                 return Desire.PROGRESS;
+            }
+            else {
+                return Desire.HELP;
             }
         }
         else{
