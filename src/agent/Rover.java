@@ -1,21 +1,14 @@
 package agent;
 
+import desire.Explore;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
-import javafx.util.Pair;
 import world.Planet;
-import agent.Position;
-import agent.State;
 import world.Type;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.Vector;
 
 
@@ -67,13 +60,8 @@ public class Rover extends Agent {
         });*/
 
         FSMBehaviour fsm = new FSMBehaviour(this);
-        fsm.registerFirstState(new startBehaviour(),"start");
-        fsm.registerFirstState(new exploring(this),"exploring");
+        fsm.registerFirstState(new Explore(this),"exploring");
 
-
-
-
-        fsm.registerDefaultTransition("start","exploring");
         fsm.registerTransition("exploring", "exploring", 0);
 
 
