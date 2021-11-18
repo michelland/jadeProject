@@ -65,11 +65,14 @@ public class Rover extends Agent {
                 //block();
             }
         });*/
-
-        FSMBehaviour fsm = new FSMBehaviour(this);
-        fsm.registerFirstState(new Explore(this),"exploring");
-
-        fsm.registerTransition("exploring", "exploring", 0);
+        // update beliefs
+        // compute next intentions
+        //compue the desir
+        //filter
+        //      if same desire do intentions
+        //      else compute intention from blank intention
+        //give intention to plans
+        //plans do the action need for the intention
 
 
     }
