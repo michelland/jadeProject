@@ -8,18 +8,13 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import world.Planet;
 import world.Type;
+import bdi.Beliefs;
 
 import java.util.Vector;
 
 
 public class Rover extends Agent {
 
-    protected String name;
-    //public State state;
-    public ACLMessage msg;
-    public int battery_pourcentage = 100;
-    public int nb_sample = 0;
-    public int heure = 0;
     protected Beliefs beliefs;
     protected FSMBehaviour fsm;
 
@@ -29,13 +24,13 @@ public class Rover extends Agent {
     public int getNb_sample() { return beliefs.getNb_sample();}
     public int getY() { return beliefs.getY();}
     public int getX() { return beliefs.getX();}
-    public int getHeure() { return heure;}
+    public int getHeure() { return  beliefs.getHeure();}
     public Status getStatus() { return beliefs.getStatus();}
     public boolean isHS() { return getStatus()==Status.HS;}
     public void setX(int x) { beliefs.setX(x);}
     public void setY(int y) { beliefs.setY(y);}
+    public void setMsg(ACLMessage mess) {beliefs.setMsg(mess);}
     public void setStatus(Status status) { beliefs.setStatus(status);}
-    public void setHS(boolean b) { beliefs.setHs();}
 
     @Override
     protected void setup() {
@@ -86,9 +81,17 @@ public class Rover extends Agent {
         }
     }
 
+    public void perception() {
+        beliefs.setCurrentType(Planet.terrain.getType(getX(),getY()));
+        ACLMessage msg = receive();
+        if (msg != null) {
+            //System.out.println(myAgent.getLocalName() + ":" + msg.getContent());
+        }
+    }
+
     @Override
     protected void takeDown() {
-        System.out.println("Destruction de " + name);
+        System.out.println("Destruction de " + getName());
     }
 
     public void sendMessage(String content, String dest) {
@@ -99,49 +102,31 @@ public class Rover extends Agent {
     }
 
     public void sendPositionToPlanet() {
-        String content = "position:" + state.getX() + "," + state.getY();
+        String content = "position:" + getX() + "," + getY();
         sendMessage(content, "Planet");
-        System.out.println(name + " > je suis a la position " + state.getX() + "," + state.getY());
+        System.out.println(getName() + " > je suis a la position " + getX() + "," + getY());
     }
 
     public void sendHSToPlanet() {
         String content = "hs: ";
         sendMessage(content, "Planet");
-        System.out.println(name + " > je suis HS");
+        System.out.println(getName() + " > je suis HS");
     }
 
     public void moveRandom() {
-        if (!state.isHS()) {
-            Position current = new Position(state.getX(),state.getY());
+        if (!isHS()) {
+            Position current = new Position(getX(),getY());
             Vector<Position> possible_positions = current.legalPositions();
             int index = (int) (Math.random() * (possible_positions.size()));
-            state.setX(possible_positions.get(index).x);
-            state.setY(possible_positions.get(index).y);
+            setX(possible_positions.get(index).x);
+            setY(possible_positions.get(index).y);
             sendPositionToPlanet();
-            if (Planet.terrain.getType(state.getX(),state.getY()) == Type.CRATER) {
-                state.setHS(true);
-                state.setStatus(Status.HS);
+            if (Planet.terrain.getType(getX(),getY()) == Type.CRATER) {
+                setStatus(Status.HS);
                 sendHSToPlanet();
             }
         }
     }
-    private static class receiving extends OneShotBehaviour{
-
-        Rover agent;
-
-        public receiving(Rover _a){
-            this.agent = _a;
-        }
-
-        @Override
-        public void action() {
-            agent.msg = agent.receive();
-        }
-    }
-
-
-
-
 }
 
 

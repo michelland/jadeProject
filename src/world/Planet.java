@@ -27,8 +27,8 @@ public class Planet extends Agent {
     public static int time = 0;
 
     /**************************** UI *****************************/
-    public static final int WIDTH = 600;
-    public static final int HEIGHT = 600;
+    public static final int WIDTH = 800;
+    public static final int HEIGHT = 800;
 
     @Override
     protected void setup() {

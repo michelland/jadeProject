@@ -1,8 +1,10 @@
-package agent;
+package bdi;
 
+import agent.Status;
 import jade.lang.acl.ACLMessage;
+import world.Type;
 
-    public class Beliefs {
+public class Beliefs {
         protected String name;
         protected ACLMessage msg;
         protected int battery_pourcentage = 100;
@@ -10,6 +12,16 @@ import jade.lang.acl.ACLMessage;
         protected int heure = 0;
         protected int x;
         protected int y;
+        protected Type currentType;
+
+        public void setCurrentType(Type currentType) {
+            this.currentType = currentType;
+        }
+
+        public Type getCurrentType() {
+            return currentType;
+        }
+
         protected Status status;
 
         public Beliefs(String name, int _x, int _y){
@@ -79,4 +91,5 @@ import jade.lang.acl.ACLMessage;
         public void setStatus(Status status) {
             this.status = status;
         }
+
     }
