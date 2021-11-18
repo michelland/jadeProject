@@ -20,6 +20,7 @@ public class Planet extends Agent {
     /*************************** WORLD *****************************/
     public static Terrain terrain;
     public static boolean dayLight = false;
+    public static int heure = 0;
     public static int nbagents = 6;
     public static State state = new State(0,0);
     public static Map<Integer, State> states = new HashMap<Integer, State>();

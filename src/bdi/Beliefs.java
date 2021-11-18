@@ -13,6 +13,7 @@ public class Beliefs {
         protected int x;
         protected int x_mayday = -1;
         protected int y;
+        protected int y_mayday = -1;
         protected Type currentType;
 
         public void setCurrentType(Type currentType) {
