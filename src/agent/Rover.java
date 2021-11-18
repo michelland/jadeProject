@@ -15,23 +15,35 @@ import java.util.Vector;
 public class Rover extends Agent {
 
     protected String name;
-    public State state;
+    //public State state;
     public ACLMessage msg;
     public int battery_pourcentage = 100;
     public int nb_sample = 0;
     public int heure = 0;
+    protected Beliefs beliefs;
+    protected FSMBehaviour fsm;
 
-
+    public Beliefs getBeliefs() { return beliefs;}
+    public ACLMessage getMsg() { return beliefs.getMsg();}
+    public int getBattery_pourcentage() { return beliefs.getBattery_pourcentage();}
+    public int getNb_sample() { return beliefs.getNb_sample();}
+    public int getY() { return beliefs.getY();}
+    public int getX() { return beliefs.getX();}
+    public int getHeure() { return heure;}
+    public Status getStatus() { return beliefs.getStatus();}
+    public boolean isHS() { return getStatus()==Status.HS;}
+    public void setX(int x) { beliefs.setX(x);}
+    public void setY(int y) { beliefs.setY(y);}
+    public void setStatus(Status status) { beliefs.setStatus(status);}
+    public void setHS(boolean b) { beliefs.setHs();}
 
     @Override
     protected void setup() {
-        name = this.getAID().getLocalName();
         int x = (int) (Math.random() * (Planet.SIZE));
         int y = (int) (Math.random() * (Planet.SIZE));
-        state = new State(x,y);
+        beliefs = new Beliefs(this.getAID().getLocalName(),x,y);
 
 
-        state.setStatus(Status.RUNNING);
 
         /*addBehaviour(new CyclicBehaviour() {
 
@@ -79,7 +91,7 @@ public class Rover extends Agent {
         System.out.println("Destruction de " + name);
     }
 
-    protected void sendMessage(String content, String dest) {
+    public void sendMessage(String content, String dest) {
         ACLMessage message = new ACLMessage(ACLMessage.INFORM);
         message.setContent(content);
         message.addReceiver(new AID(dest, AID.ISLOCALNAME));
@@ -128,47 +140,7 @@ public class Rover extends Agent {
     }
 
 
-    private class exploring extends OneShotBehaviour{
 
-        Rover rover;
-        int next_state = 0;
-
-        public exploring(Rover _rover) {
-            rover = _rover;
-        }
-
-        @Override
-        public void action() {
-            String content_msg = "getinfo:" + rover.state.getX() + "," + rover.state.getY();
-            sendMessage(content_msg, "Planet");
-
-            rover.msg = rover.blockingReceive();
-
-            String[] content = rover.msg.getContent().split("-");
-            if(rover.battery_pourcentage < 10){
-                next_state = 1; // go to recharging
-            }
-            else if(Objects.equals(content[0], "help")){
-                next_state = 2; // go to help
-                //TODO add the parse of a position and the varaible in rover to stotre this position
-            }
-            else if(Objects.equals(content[0], "sample")){
-                next_state = 3; // go to gathering
-            }
-            else if(Objects.equals(content[0], "mouvement")){
-                //TODO add the code to choose in what direction go
-                //binary number on each direction summed to have a int as a sup up of direction
-                // 1    or perhaps juste a list inside []
-                //8 2
-                // 4
-                next_state = 0; // redo this state
-            }
-        }
-
-        public int onEnd(){
-            return next_state;
-        }
-    }
 
 }
 
