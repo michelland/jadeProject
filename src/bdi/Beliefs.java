@@ -11,6 +11,7 @@ public class Beliefs {
         protected int nb_sample = 0;
         protected int heure = 0;
         protected int x;
+        protected int x_mayday = -1;
         protected int y;
         protected Type currentType;
 
@@ -54,9 +55,13 @@ public class Beliefs {
             this.x = x;
         }
 
+        public int getX_mayday() { return x_mayday; }
+
+        public int getY_mayday() { return y_mayday; }
+
         public void setY(int y) {
-            this.y = y;
-        }
+                this.y = y;
+            }
 
         public int getX() {
             return x;
@@ -90,6 +95,13 @@ public class Beliefs {
 
         public void setStatus(Status status) {
             this.status = status;
+        }
+
+        public boolean nextToMayday(){
+            return (x == x_mayday && y == y_mayday-1) ||
+                    (x == x_mayday && y == y_mayday+1) ||
+                    (x == x_mayday+1 && y == y_mayday+1) ||
+                    (x == x_mayday-1 && y == y_mayday+1);
         }
 
     }

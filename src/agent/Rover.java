@@ -88,7 +88,8 @@ public class Rover extends Agent {
         beliefs.setCurrentType(Planet.terrain.getType(getX(),getY()));
         ACLMessage msg = receive();
         if (msg != null) {
-            //System.out.println(myAgent.getLocalName() + ":" + msg.getContent());
+            setMsg(msg);
+            System.out.println(getName() + ":" + msg.getContent());
         }
     }
 
