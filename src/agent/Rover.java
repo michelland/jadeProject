@@ -21,24 +21,24 @@ public class Rover extends Agent {
     protected Intention intention;
     protected Desire desire;
 
-    public Beliefs getBeliefs() { return beliefs;}
-    public ACLMessage getMsg() { return beliefs.getMsg();}
-    public int getBattery_pourcentage() { return beliefs.getBattery_pourcentage();}
-    public int getNb_sample() { return beliefs.getNb_sample();}
-    public int getY() { return beliefs.getY();}
-    public int getX() { return beliefs.getX();}
-    public int getHeure() { return  beliefs.getHeure();}
-    public Type getCurrentType() { return beliefs.getCurrentType();}
-    public Status getStatus() { return beliefs.getStatus();}
-    public boolean isHS() { return getStatus()==Status.HS;}
-    public void setX(int x) { beliefs.setX(x);}
-    public void setY(int y) { beliefs.setY(y);}
+    public Beliefs getBeliefs() {return beliefs;}
+    public ACLMessage getMsg() {return beliefs.getMsg();}
+    public int getBattery_pourcentage() {return beliefs.getBattery_pourcentage();}
+    public int getNb_sample() {return beliefs.getNb_sample();}
+    public int getY() {return beliefs.getY();}
+    public int getX() {return beliefs.getX();}
+    public int getHeure() {return beliefs.getHeure();}
+    public Type getCurrentType() {return beliefs.getCurrentType();}
+    public Status getStatus() {return beliefs.getStatus();}
+    public boolean isHS() {return getStatus() == Status.HS;}
+    public void setX(int x) {beliefs.setX(x);}
+    public void setY(int y) {beliefs.setY(y);}
     public void setMsg(ACLMessage mess) {beliefs.setMsg(mess);}
-    public void setStatus(Status status) { beliefs.setStatus(status);}
-    public void setHeure(int h) { beliefs.setHeure(h);}
-    public boolean nextToMayday(){ return beliefs.nextToMayday(); }
-    public int getX_mayday() { return beliefs.getX_mayday(); }
-    public int getY_mayday() { return beliefs.getY_mayday(); }
+    public void setStatus(Status status) {beliefs.setStatus(status);}
+    public void setHeure(int h) {beliefs.setHeure(h);}
+    public boolean nextToMayday() {return beliefs.nextToMayday();}
+    public int getX_mayday() {return beliefs.getX_mayday();}
+    public int getY_mayday() {return beliefs.getY_mayday();}
 
     @Override
     protected void setup() {
