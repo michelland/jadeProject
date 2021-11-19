@@ -27,6 +27,9 @@ public class Decision_Process {
             }
         }
         else{
+            if(_r.getBattery_pourcentage() <= 10){
+                return Intention.RECHARGING;
+            }
             if(_r.nextToMayday()){
                 return Intention.SAVING;
             }

@@ -105,8 +105,8 @@ public class Beliefs {
         public boolean nextToMayday(){
             return (x == x_mayday && y == y_mayday-1) ||
                     (x == x_mayday && y == y_mayday+1) ||
-                    (x == x_mayday+1 && y == y_mayday+1) ||
-                    (x == x_mayday-1 && y == y_mayday+1);
+                    (x == x_mayday+1 && y == y_mayday) ||
+                    (x == x_mayday-1 && y == y_mayday);
         }
 
     }
