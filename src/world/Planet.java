@@ -29,15 +29,15 @@ public class Planet extends Agent {
     public static int heureNuit = 18;
     public static int heureJour = 0;
     public static int timerTick = 1000;
-    public static int nbagents = 3;
+    public static int nbagents = 2;
     public static State state = new State(0,0);
     public static Map<Integer, State> states = new HashMap<Integer, State>();
 
     public static int time = 0;
 
     /**************************** UI *****************************/
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 800;
+    public static final int WIDTH = 600;
+    public static final int HEIGHT = 600;
 
     /**************************** AGENT *****************************/
     public static final int rechargeEfficiency = 10;

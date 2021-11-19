@@ -21,6 +21,8 @@ public class Rover extends Agent {
     protected Intention intention;
     protected Desire desire;
 
+    protected boolean helpSended = false;
+
     public Beliefs getBeliefs() {return beliefs;}
     public ACLMessage getMsg() {return beliefs.getMsg();}
     public int getBattery_pourcentage() {return beliefs.getBattery_pourcentage();}
@@ -44,7 +46,7 @@ public class Rover extends Agent {
     protected void setup() {
         int x = (int) (Math.random() * (Planet.SIZE));
         int y = (int) (Math.random() * (Planet.SIZE));
-        beliefs = new Beliefs(this.getAID().getLocalName(), x, y);
+        beliefs = new Beliefs(getLocalName(), x, y);
         desire = Desire.PROGRESS;
         intention = Intention.EXPLORING;
 
@@ -52,8 +54,9 @@ public class Rover extends Agent {
             @Override
             public void onTick() {
 
-                System.out.println(getX_mayday());
-                System.out.println(getY_mayday());
+//                System.out.println(getX_mayday());
+//                System.out.println(getY_mayday());
+                //System.out.println(beliefs.getName());
                 perception();
                 intention = Decision_Process.option(desire, intention, (Rover) this.myAgent);
                 desire = Decision_Process.des(desire, intention, (Rover) this.myAgent);
@@ -100,23 +103,37 @@ public class Rover extends Agent {
         System.out.println("Destruction de " + getName());
     }
 
-    public void sendMessage(String content, String dest) {
-        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+    public void sendMessage(int type, String content, String dest) {
+        ACLMessage message = new ACLMessage(type);
         message.setContent(content);
         message.addReceiver(new AID(dest, AID.ISLOCALNAME));
         send(message);
     }
 
+    public void sendMayday() {
+        if (!helpSended) {
+            helpSended = true;
+            ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+            String content = "mayday-" + getX() + "," + getY();
+            for (int i=0 ; i<Planet.nbagents ; i++) {
+                if (i != Integer.parseInt(getLocalName())) {
+                    sendMessage(ACLMessage.REQUEST, content, Integer.toString(i));
+                    System.out.println(getLocalName() + " > " + i + " " + content);
+                }
+            }
+        }
+    }
+
 
     public void sendPositionToPlanet() {
         String content = "position:" + getX() + "," + getY();
-        sendMessage(content, "Planet");
+        sendMessage(ACLMessage.INFORM, content, "Planet");
         //System.out.println(getName() + " > je suis a la position " + getX() + "," + getY());
     }
 
     public void sendHSToPlanet() {
         String content = "hs: ";
-        sendMessage(content, "Planet");
+        sendMessage(ACLMessage.INFORM, content, "Planet");
         //System.out.println(getName() + " > je suis HS");
     }
 
@@ -183,20 +200,21 @@ public class Rover extends Agent {
     }
 
     public void moveToMayday() {
+        System.out.println("helping " + getX_mayday() + "," + getY_mayday());
         int diffX = getX() - getBeliefs().getX_mayday();
         int diffY = getY() - getBeliefs().getY_mayday();
 
         if (diffX < 0) {
-            move(getX() - 1, getY());
-        }
-        else if (diffX > 0) {
             move(getX() + 1, getY());
         }
-        if (diffY < 0) {
-            move(getX(), getY() - 1);
+        else if (diffX > 0) {
+            move(getX() - 1, getY());
+        }
+        else if (diffY < 0) {
+            move(getX(), getY() + 1);
         }
         else if (diffY > 0) {
-            move(getX(), getY() + 1);
+            move(getX(), getY() - 1);
         }
         decharge();
     }
