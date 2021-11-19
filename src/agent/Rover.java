@@ -54,7 +54,7 @@ public class Rover extends Agent {
         desire = Desire.PROGRESS;
         intention = Intention.EXPLORING;
 
-        addBehaviour(new TickerBehaviour(this, 1200) {
+        addBehaviour(new TickerBehaviour(this, 400) {
             @Override
             public void onTick() {
                 perception();
@@ -89,7 +89,7 @@ public class Rover extends Agent {
             content = "running: ";
         }
         else if (beliefs.getStatus() == Status.RECHARGING) {
-            content = "recharching: ";
+            content = "recharging: ";
         }
         sendMessage(ACLMessage.INFORM, content, "Planet");
         //System.out.println(getName() + " > je suis HS");
@@ -160,6 +160,7 @@ public class Rover extends Agent {
 
     /************************************** EXPLORING ***************************************/
     public void moveRandom() {
+        beliefs.setStatus(Status.RUNNING);
         Position current = new Position(getX(), getY());
         Vector<Position> possible_positions = current.legalPositions();
         int index = (int) (Math.random() * (possible_positions.size()));
@@ -168,6 +169,7 @@ public class Rover extends Agent {
 
     /************************************** GATHERING ****************************************/
     public void gather() {
+        beliefs.setStatus(Status.RUNNING);
         if (batteryRemaining()) {
             if (Planet.terrain.getType(getX(), getY()).equals(Type.SAMPLE)) {
                 int sample_size = (int) ((Math.random() * (Planet.gatherVariance - 1)) + 1);
@@ -180,6 +182,7 @@ public class Rover extends Agent {
 
     /************************************** ANALYSING ****************************************/
     public void analysing() {
+        beliefs.setStatus(Status.RUNNING);
         if (batteryRemaining()) {
             int number_of_sample = beliefs.getNb_sample();
             if (number_of_sample >= Planet.numberOfSampleNecessaryForAnalysis) {
@@ -194,6 +197,7 @@ public class Rover extends Agent {
 
     /************************************** RECHARGING ***************************************/
     public void recharge() {
+        beliefs.setStatus(Status.RECHARGING);
         if (Planet.dayLight) {
             int percentage = beliefs.getBattery_pourcentage();
             if (percentage < 100) {
@@ -207,6 +211,7 @@ public class Rover extends Agent {
 
     /************************************** REACHING *****************************************/
     public void moveToMayday() {
+        beliefs.setStatus(Status.RUNNING);
         if (!beliefs.isHelpingSended()) {
             String content = "helping- ";
             sendMessage(ACLMessage.INFORM, content, beliefs.getIdMayday());
@@ -233,6 +238,7 @@ public class Rover extends Agent {
 
     /************************************** SAVING *******************************************/
     public void save() {
+        beliefs.setStatus(Status.RUNNING);
         if (batteryRemaining() && nextToMayday()) {
             beliefs.setHelpingSended(true);
             String content = "save- ";
