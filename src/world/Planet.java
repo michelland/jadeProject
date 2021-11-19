@@ -18,8 +18,8 @@ import java.util.Map;
 public class Planet extends Agent {
 
     /************************* PARAMATERS ***************************/
-    public static final int SIZE = 10;
-    public static final float CRATER_RATE = 0.2f;
+    public static final int SIZE = 8;
+    public static final float CRATER_RATE = 0.15f;
     public static final float SAMPLE_RATE = 0.3f;
 
     /*************************** WORLD *****************************/
@@ -29,11 +29,7 @@ public class Planet extends Agent {
     public static int heureNuit = 18;
     public static int heureJour = 0;
     public static int timerTick = 1000;
-    public static int nbagents = 2;
-    public static State state = new State(0,0);
-    public static Map<Integer, State> states = new HashMap<Integer, State>();
-
-    public static int time = 0;
+    public static int nbagents = 3;
 
     /**************************** UI *****************************/
     public static final int WIDTH = 1000;
@@ -44,6 +40,7 @@ public class Planet extends Agent {
     public static final int dechargeEfficiency = 10;
     public static final int numberOfSampleNecessaryForAnalysis = 4;
     public static final int gatherVariance = 3;
+    public static Map<Integer, State> states = new HashMap<Integer, State>();
 
     @Override
     protected void setup() {
@@ -83,20 +80,16 @@ public class Planet extends Agent {
                             //        " > Rover " + sender + " a la position " + states.get(sender).getX() + "," + states.get(sender).getY());
                             break;
                         case "hs":
-                            states.get(sender).setHS(true);
                             states.get(sender).setStatus(Status.HS);
                             break;
                         case "running":
-                            states.get(sender).setHS(false);
                             states.get(sender).setStatus(Status.RUNNING);
                             break;
                         case "recharching":
-                            states.get(sender).setHS(false);
                             states.get(sender).setStatus(Status.RECHARGING);
                             break;
                     }
                 }
-                //block();
             }
         });
     }
