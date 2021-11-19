@@ -11,8 +11,18 @@ public class Beliefs {
         protected int nb_sample = 0;
         protected int heure = 0;
         protected String idMayday;
+        protected String idHelping;
         protected int x;
-        protected int x_mayday = -1;
+
+    public void setIdHelping(String idHelping) {
+        this.idHelping = idHelping;
+    }
+
+    public String getIdHelping() {
+        return idHelping;
+    }
+
+    protected int x_mayday = -1;
         protected int y;
 
     public void setIdMayday(String idMayday) {

@@ -50,7 +50,7 @@ public class Rover extends Agent {
         desire = Desire.PROGRESS;
         intention = Intention.EXPLORING;
 
-        addBehaviour(new TickerBehaviour(this, 500) {
+        addBehaviour(new TickerBehaviour(this, 2000) {
             @Override
             public void onTick() {
 
@@ -77,7 +77,7 @@ public class Rover extends Agent {
 
     }
     //TODO ecrire fonction qui reçoit message, et l'appeler au début de perception
-    public void receiveMayday() {
+    public void receiveMessage() {
         ACLMessage msg = receive();
         if (msg != null) {
             String message = msg.getContent();
@@ -95,12 +95,20 @@ public class Rover extends Agent {
                 helpSended = 0;
                 sendStatusToPlanet();
             }
+            else if (type.equals("helping")) {
+                beliefs.setIdHelping(msg.getSender().getLocalName());
+                sendNoMayday();
+            }
+            else if (type.equals("nomayday")) {
+                beliefs.setX_mayday(-1);
+                beliefs.setY_mayday(-1);
+            }
         }
     }
 
     public void perception() {
         beliefs.setCurrentType(Planet.terrain.getType(getX(), getY()));
-        receiveMayday();
+        receiveMessage();
         setHeure(Planet.heure);
     }
 
@@ -115,10 +123,13 @@ public class Rover extends Agent {
         message.addReceiver(new AID(dest, AID.ISLOCALNAME));
         send(message);
     }
+    public void sendHelpingYou() {
+        String content = "helping- ";
+        sendMessage(ACLMessage.INFORM, content, beliefs.getIdMayday());
+    }
 
     public void sendMayday() {
         if ((helpSended % 10) == 0) {
-            ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
             String content = "mayday-" + getX() + "," + getY();
             for (int i=0 ; i<Planet.nbagents ; i++) {
                 if (i != Integer.parseInt(getLocalName())) {
@@ -130,6 +141,17 @@ public class Rover extends Agent {
         helpSended ++;
     }
 
+    public void sendNoMayday() {
+        String content = "nomayday-" + getX() + "," + getY();
+        System.out.println(getLocalName() + " > " + " " + content);
+        for (int i=0 ; i<Planet.nbagents ; i++) {
+            //if ((i != Integer.parseInt(getLocalName())) && (i != Integer.parseInt(beliefs.getIdHelping()))){
+            if (i != Integer.parseInt(beliefs.getIdHelping())) {
+                sendMessage(ACLMessage.INFORM, content, Integer.toString(i));
+                System.out.println(getLocalName() + " > " + i + " " + content);
+            }
+        }
+    }
 
     public void sendPositionToPlanet() {
         String content = "position:" + getX() + "," + getY();
@@ -233,6 +255,7 @@ public class Rover extends Agent {
     }
 
     public void moveToMayday() {
+        sendHelpingYou();
         System.out.println("helping " + getX_mayday() + "," + getY_mayday());
         int diffX = getX() - getBeliefs().getX_mayday();
         int diffY = getY() - getBeliefs().getY_mayday();

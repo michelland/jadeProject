@@ -29,7 +29,7 @@ public class Planet extends Agent {
     public static int heureNuit = 18;
     public static int heureJour = 0;
     public static int timerTick = 1000;
-    public static int nbagents = 5;
+    public static int nbagents = 2;
     public static State state = new State(0,0);
     public static Map<Integer, State> states = new HashMap<Integer, State>();
 
