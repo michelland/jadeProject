@@ -19,7 +19,7 @@ public class Planet extends Agent {
 
     /************************* PARAMATERS ***************************/
     public static final int SIZE = 10;
-    public static final float CRATER_RATE = 0.1f;
+    public static final float CRATER_RATE = 0.2f;
     public static final float SAMPLE_RATE = 0.3f;
 
     /*************************** WORLD *****************************/
@@ -36,8 +36,8 @@ public class Planet extends Agent {
     public static int time = 0;
 
     /**************************** UI *****************************/
-    public static final int WIDTH = 600;
-    public static final int HEIGHT = 600;
+    public static final int WIDTH = 1000;
+    public static final int HEIGHT = 1000;
 
     /**************************** AGENT *****************************/
     public static final int rechargeEfficiency = 80;

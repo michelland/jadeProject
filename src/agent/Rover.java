@@ -41,6 +41,10 @@ public class Rover extends Agent {
     public boolean nextToMayday() {return beliefs.nextToMayday();}
     public int getX_mayday() {return beliefs.getX_mayday();}
     public int getY_mayday() {return beliefs.getY_mayday();}
+    protected void takeDown() {
+        System.out.println("Destruction de " + getName());
+    }
+    public boolean batteryRemaining() {return getBattery_pourcentage() >= 10;}
 
     @Override
     protected void setup() {
@@ -53,30 +57,72 @@ public class Rover extends Agent {
         addBehaviour(new TickerBehaviour(this, 2000) {
             @Override
             public void onTick() {
-
-//                System.out.println(getX_mayday());
-//                System.out.println(getY_mayday());
-                //System.out.println(beliefs.getIdMayday());
                 perception();
                 intention = Decision_Process.option(desire, intention, (Rover) this.myAgent);
                 desire = Decision_Process.des(desire, intention, (Rover) this.myAgent);
                 intention = Filter.filter(desire, intention, (Rover) this.myAgent);
                 Plans.execute(intention, (Rover) this.myAgent);
-                //block();
             }
         });
-        // update beliefs
-        // compute next intentions
-        //compue the desir
-        //filter
-        //      if same desire do intentions
-        //      else compute intention from blank intention
-        //give intention to plans
-        //plans do the action need for the intention
-
-
     }
-    //TODO ecrire fonction qui reçoit message, et l'appeler au début de perception
+
+    /**************************************** MESSAGES ********************************************/
+    public void sendMessage(int type, String content, String dest) {
+        ACLMessage message = new ACLMessage(type);
+        message.setContent(content);
+        message.addReceiver(new AID(dest, AID.ISLOCALNAME));
+        send(message);
+    }
+
+    public void sendPositionToPlanet() {
+        String content = "position:" + getX() + "," + getY();
+        sendMessage(ACLMessage.INFORM, content, "Planet");
+        //System.out.println(getName() + " > je suis a la position " + getX() + "," + getY());
+    }
+
+    public void sendStatusToPlanet() {
+        String content = "";
+        if (beliefs.getStatus() == Status.HS) {
+            content = "hs: ";
+        }
+        else if (beliefs.getStatus() == Status.RUNNING){
+            content = "running: ";
+        }
+        else if (beliefs.getStatus() == Status.RECHARGING) {
+            content = "recharching: ";
+        }
+        sendMessage(ACLMessage.INFORM, content, "Planet");
+        //System.out.println(getName() + " > je suis HS");
+    }
+
+    /**************************************** MOVEMENT ********************************************/
+    public void decharge() {
+        if (batteryRemaining()) {
+            int percentage = beliefs.getBattery_pourcentage();
+            beliefs.setBattery_pourcentage((percentage - Planet.dechargeEfficiency));
+        }
+    }
+
+    public void move(int _x, int _y) {
+        if (!isHS() && batteryRemaining()) {
+            setX(_x);
+            setY(_y);
+            sendPositionToPlanet();
+            if (Planet.terrain.getType(getX(), getY()) == Type.CRATER) {
+                setStatus(Status.HS);
+                sendStatusToPlanet();
+            }
+            decharge();
+        }
+    }
+
+    /************************************** PERCEPTION ***************************************/
+    public void perception() {
+        beliefs.setCurrentType(Planet.terrain.getType(getX(), getY()));
+        setHeure(Planet.heure);
+        receiveMessage();
+    }
+
     public void receiveMessage() {
         ACLMessage msg = receive();
         if (msg != null) {
@@ -106,27 +152,92 @@ public class Rover extends Agent {
         }
     }
 
-    public void perception() {
-        beliefs.setCurrentType(Planet.terrain.getType(getX(), getY()));
-        receiveMessage();
-        setHeure(Planet.heure);
+    /************************************** EXPLORING ***************************************/
+    public void moveRandom() {
+        Position current = new Position(getX(), getY());
+        Vector<Position> possible_positions = current.legalPositions();
+        int index = (int) (Math.random() * (possible_positions.size()));
+        move(possible_positions.get(index).x, possible_positions.get(index).y);
     }
 
-    @Override
-    protected void takeDown() {
-        System.out.println("Destruction de " + getName());
+    /************************************** GATHERING ****************************************/
+    public void gather() {
+        if (batteryRemaining()) {
+            if (Planet.terrain.getType(getX(), getY()).equals(Type.SAMPLE)) {
+                int sample_size = (int) ((Math.random() * (Planet.gatherVariance - 1)) + 1);
+                beliefs.setNb_sample(getNb_sample() + sample_size);
+                Planet.terrain.removeSample(getX(), getY());
+            }
+            decharge();
+        }
     }
 
-    public void sendMessage(int type, String content, String dest) {
-        ACLMessage message = new ACLMessage(type);
-        message.setContent(content);
-        message.addReceiver(new AID(dest, AID.ISLOCALNAME));
-        send(message);
+    /************************************** ANALYSING ****************************************/
+    public void analysing() {
+        if (batteryRemaining()) {
+            int number_of_sample = beliefs.getNb_sample();
+            if (number_of_sample >= Planet.numberOfSampleNecessaryForAnalysis) {
+                beliefs.setNb_sample(number_of_sample - Planet.numberOfSampleNecessaryForAnalysis);
+                System.out.println("Analyse réussit");
+            } else {
+                System.out.println("Analyse échouée");
+            }
+            decharge();
+        }
     }
+
+    /************************************** RECHARGING ***************************************/
+    public void recharge() {
+        if (Planet.dayLight) {
+            int percentage = beliefs.getBattery_pourcentage();
+            if (percentage < 100) {
+                int min = 1;
+                int max = Planet.rechargeEfficiency / 10;
+                int recharge_rate = (int) ((Math.random() * (max - min + 1)) + min);
+                beliefs.setBattery_pourcentage((percentage + (recharge_rate * 10)) % 100);
+            }
+        }
+    }
+
+    /************************************** REACHING *****************************************/
+    public void moveToMayday() {
+        sendHelpingYou();
+        System.out.println("helping " + getX_mayday() + "," + getY_mayday());
+        int diffX = getX() - getBeliefs().getX_mayday();
+        int diffY = getY() - getBeliefs().getY_mayday();
+
+        if (diffX < 0) {
+            move(getX() + 1, getY());
+        }
+        else if (diffX > 0) {
+            move(getX() - 1, getY());
+        }
+        else if (diffY < 0) {
+            move(getX(), getY() + 1);
+        }
+        else if (diffY > 0) {
+            move(getX(), getY() - 1);
+        }
+        decharge();
+    }
+
     public void sendHelpingYou() {
         String content = "helping- ";
         sendMessage(ACLMessage.INFORM, content, beliefs.getIdMayday());
     }
+
+    /************************************** SAVING *******************************************/
+    public void save() {
+        if (batteryRemaining() && nextToMayday()) {
+            String content = "save- ";
+            sendMessage(ACLMessage.INFORM, content, beliefs.getIdMayday());
+            beliefs.setX_mayday(-1);
+            beliefs.setY_mayday(-1);
+            System.out.println(getLocalName() + " > " + beliefs.getIdMayday() + " : " + "I'm saving you !");
+        }
+    }
+
+    /************************************** MAYDAY *******************************************/
 
     public void sendMayday() {
         if ((helpSended % 10) == 0) {
@@ -153,126 +264,14 @@ public class Rover extends Agent {
         }
     }
 
-    public void sendPositionToPlanet() {
-        String content = "position:" + getX() + "," + getY();
-        sendMessage(ACLMessage.INFORM, content, "Planet");
-        //System.out.println(getName() + " > je suis a la position " + getX() + "," + getY());
-    }
-
-    public void sendStatusToPlanet() {
-        String content = "";
-        if (beliefs.getStatus() == Status.HS) {
-            content = "hs: ";
-        }
-        else if (beliefs.getStatus() == Status.RUNNING){
-            content = "running: ";
-        }
-        else if (beliefs.getStatus() == Status.RECHARGING) {
-            content = "recharching: ";
-        }
-        sendMessage(ACLMessage.INFORM, content, "Planet");
-        //System.out.println(getName() + " > je suis HS");
-    }
-
-    public void moveRandom() {
-        Position current = new Position(getX(), getY());
-        Vector<Position> possible_positions = current.legalPositions();
-        int index = (int) (Math.random() * (possible_positions.size()));
-        move(possible_positions.get(index).x, possible_positions.get(index).y);
-    }
-
-    public void move(int _x, int _y) {
-        if (!isHS() && batteryRemaining()) {
-            setX(_x);
-            setY(_y);
-            sendPositionToPlanet();
-            if (Planet.terrain.getType(getX(), getY()) == Type.CRATER) {
-                setStatus(Status.HS);
-                sendStatusToPlanet();
-            }
-            decharge();
-        }
-    }
 
 
-    public boolean batteryRemaining() {
-        return getBattery_pourcentage() >= 10;
-    }
-
-    public void recharge() {
-        if (Planet.dayLight) {
-            int percentage = beliefs.getBattery_pourcentage();
-            if (percentage < 100) {
-                int min = 1;
-                int max = Planet.rechargeEfficiency / 10;
-                int recharge_rate = (int) ((Math.random() * (max - min + 1)) + min);
-                beliefs.setBattery_pourcentage((percentage + (recharge_rate * 10)) % 100);
-                System.out.println(getLocalName() + " > " + " recharging " + (percentage + (recharge_rate * 10)) % 100);
-            }
-        }
-    }
-
-    public void decharge() {
-        if (batteryRemaining()) {
-            int percentage = beliefs.getBattery_pourcentage();
-            beliefs.setBattery_pourcentage((percentage - Planet.dechargeEfficiency));
-        }
-    }
 
 
-    public void gather() {
-        if (batteryRemaining()) {
-            if (Planet.terrain.getType(getX(), getY()).equals(Type.SAMPLE)) {
-                int sample_size = (int) ((Math.random() * (Planet.gatherVariance - 1)) + 1);
-                beliefs.setNb_sample(getNb_sample() + sample_size);
-                Planet.terrain.removeSample(getX(), getY());
-            }
-            decharge();
-        }
-    }
 
-    public void analysing() {
-        if (batteryRemaining()) {
-            int number_of_sample = beliefs.getNb_sample();
-            if (number_of_sample >= Planet.numberOfSampleNecessaryForAnalysis) {
-                beliefs.setNb_sample(number_of_sample - Planet.numberOfSampleNecessaryForAnalysis);
-                System.out.println("Analyse réussit");
-            } else {
-                System.out.println("Analyse échouée");
-            }
-            decharge();
-        }
-    }
 
-    public void save() {
-        if (batteryRemaining() && nextToMayday()) {
-            String content = "save- ";
-            sendMessage(ACLMessage.INFORM, content, beliefs.getIdMayday());
-            beliefs.setX_mayday(-1);
-            beliefs.setY_mayday(-1);
-            System.out.println(getLocalName() + " > " + beliefs.getIdMayday() + " : " + "I'm saving you !");
-        }
-    }
 
-    public void moveToMayday() {
-        sendHelpingYou();
-        System.out.println("helping " + getX_mayday() + "," + getY_mayday());
-        int diffX = getX() - getBeliefs().getX_mayday();
-        int diffY = getY() - getBeliefs().getY_mayday();
 
-        if (diffX < 0) {
-            move(getX() + 1, getY());
-        }
-        else if (diffX > 0) {
-            move(getX() - 1, getY());
-        }
-        else if (diffY < 0) {
-            move(getX(), getY() + 1);
-        }
-        else if (diffY > 0) {
-            move(getX(), getY() - 1);
-        }
-        decharge();
-    }
+
 
 }
