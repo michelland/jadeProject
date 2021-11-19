@@ -50,13 +50,13 @@ public class Rover extends Agent {
         desire = Desire.PROGRESS;
         intention = Intention.EXPLORING;
 
-        addBehaviour(new TickerBehaviour(this, 1000) {
+        addBehaviour(new TickerBehaviour(this, 500) {
             @Override
             public void onTick() {
 
 //                System.out.println(getX_mayday());
 //                System.out.println(getY_mayday());
-                //System.out.println(beliefs.getName());
+                //System.out.println(beliefs.getIdMayday());
                 perception();
                 intention = Decision_Process.option(desire, intention, (Rover) this.myAgent);
                 desire = Decision_Process.des(desire, intention, (Rover) this.myAgent);
@@ -86,8 +86,14 @@ public class Rover extends Agent {
             String content = parsed_message[1];
             if (type.equals("mayday")) {
                 String[] coordinates = content.split(",");
+                beliefs.setIdMayday(msg.getSender().getLocalName());
                 beliefs.setX_mayday(Integer.parseInt(coordinates[0]));
                 beliefs.setY_mayday(Integer.parseInt(coordinates[1]));
+            }
+            else if (type.equals("save")) {
+                beliefs.setStatus(Status.RUNNING);
+                helpSended = false;
+                sendStatusToPlanet();
             }
         }
     }
@@ -131,8 +137,17 @@ public class Rover extends Agent {
         //System.out.println(getName() + " > je suis a la position " + getX() + "," + getY());
     }
 
-    public void sendHSToPlanet() {
-        String content = "hs: ";
+    public void sendStatusToPlanet() {
+        String content = "";
+        if (beliefs.getStatus() == Status.HS) {
+            content = "hs: ";
+        }
+        else if (beliefs.getStatus() == Status.RUNNING){
+            content = "running: ";
+        }
+        else if (beliefs.getStatus() == Status.RECHARGING) {
+            content = "recharching: ";
+        }
         sendMessage(ACLMessage.INFORM, content, "Planet");
         //System.out.println(getName() + " > je suis HS");
     }
@@ -151,7 +166,7 @@ public class Rover extends Agent {
             sendPositionToPlanet();
             if (Planet.terrain.getType(getX(), getY()) == Type.CRATER) {
                 setStatus(Status.HS);
-                sendHSToPlanet();
+                sendStatusToPlanet();
             }
             decharge();
         }
@@ -180,23 +195,37 @@ public class Rover extends Agent {
 
 
     public void gather() {
-        if (Planet.terrain.getType(getX(), getY()).equals(Type.SAMPLE)) {
-            int sample_size = (int) ((Math.random() * (Planet.gatherVariance - 1)) + 1);
-            beliefs.setNb_sample(getNb_sample() + sample_size);
-            Planet.terrain.removeSample(getX(), getY());
+        if (batteryRemaining()) {
+            if (Planet.terrain.getType(getX(), getY()).equals(Type.SAMPLE)) {
+                int sample_size = (int) ((Math.random() * (Planet.gatherVariance - 1)) + 1);
+                beliefs.setNb_sample(getNb_sample() + sample_size);
+                Planet.terrain.removeSample(getX(), getY());
+            }
+            decharge();
         }
-        decharge();
     }
 
     public void analysing() {
-        int number_of_sample = beliefs.getNb_sample();
-        if (number_of_sample >= Planet.numberOfSampleNecessaryForAnalysis) {
-            beliefs.setNb_sample(number_of_sample - Planet.numberOfSampleNecessaryForAnalysis);
-            System.out.println("Analyse réussit");
-        } else {
-            System.out.println("Analyse échouée");
+        if (batteryRemaining()) {
+            int number_of_sample = beliefs.getNb_sample();
+            if (number_of_sample >= Planet.numberOfSampleNecessaryForAnalysis) {
+                beliefs.setNb_sample(number_of_sample - Planet.numberOfSampleNecessaryForAnalysis);
+                System.out.println("Analyse réussit");
+            } else {
+                System.out.println("Analyse échouée");
+            }
+            decharge();
         }
-        decharge();
+    }
+
+    public void save() {
+        if (batteryRemaining() && nextToMayday()) {
+            String content = "save- ";
+            sendMessage(ACLMessage.INFORM, content, beliefs.getIdMayday());
+            beliefs.setX_mayday(-1);
+            beliefs.setY_mayday(-1);
+            System.out.println(getLocalName() + " > " + beliefs.getIdMayday() + " : " + "I'm saving you !");
+        }
     }
 
     public void moveToMayday() {

@@ -10,10 +10,20 @@ public class Beliefs {
         protected int battery_pourcentage = 100;
         protected int nb_sample = 0;
         protected int heure = 0;
+        protected String idMayday;
         protected int x;
         protected int x_mayday = -1;
         protected int y;
-        protected int y_mayday = -1;
+
+    public void setIdMayday(String idMayday) {
+        this.idMayday = idMayday;
+    }
+
+    public String getIdMayday() {
+        return idMayday;
+    }
+
+    protected int y_mayday = -1;
         protected Type currentType;
 
         public void setCurrentType(Type currentType) {

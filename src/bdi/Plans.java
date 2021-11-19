@@ -31,7 +31,7 @@ public class Plans {
                     System.out.println(rover.getLocalName() + " > REACHING");
                     break;
                 case SAVING:
-                    //rover.gather();
+                    rover.save();
                     System.out.println(rover.getLocalName() + " > SAVING");
                     break;
                 case MAYDAY:

@@ -11,6 +11,7 @@ public class State {
         x = _x;
         y = _y;
         hs = false;
+        status = Status.RUNNING;
     }
 
     public void setX(int _x) {
