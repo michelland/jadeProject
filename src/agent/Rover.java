@@ -181,7 +181,11 @@ public class Rover extends Agent {
         if (Planet.dayLight) {
             int percentage = beliefs.getBattery_pourcentage();
             if (percentage < 100) {
-                beliefs.setBattery_pourcentage((percentage + Planet.rechargeEfficiency) % 100);
+                int min = 1;
+                int max = Planet.rechargeEfficiency / 10;
+                int recharge_rate = (int) ((Math.random() * (max - min + 1)) + min);
+                beliefs.setBattery_pourcentage((percentage + (recharge_rate * 10)) % 100);
+                System.out.println(getLocalName() + " > " + " recharging " + (percentage + (recharge_rate * 10)) % 100);
             }
         }
     }

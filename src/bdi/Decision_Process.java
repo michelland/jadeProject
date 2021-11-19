@@ -27,6 +27,9 @@ public class Decision_Process {
             }
         }
         else{
+            if(_r.isHS()){
+                return Intention.MAYDAY;
+            }
             if(_r.getBattery_pourcentage() <= 10){
                 return Intention.RECHARGING;
             }
