@@ -21,7 +21,7 @@ public class Rover extends Agent {
     protected Intention intention;
     protected Desire desire;
 
-    protected boolean helpSended = false;
+    protected int helpSended = 0;
 
     public Beliefs getBeliefs() {return beliefs;}
     public ACLMessage getMsg() {return beliefs.getMsg();}
@@ -92,7 +92,7 @@ public class Rover extends Agent {
             }
             else if (type.equals("save")) {
                 beliefs.setStatus(Status.RUNNING);
-                helpSended = false;
+                helpSended = 0;
                 sendStatusToPlanet();
             }
         }
@@ -117,8 +117,7 @@ public class Rover extends Agent {
     }
 
     public void sendMayday() {
-        if (!helpSended) {
-            helpSended = true;
+        if ((helpSended % 10) == 0) {
             ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
             String content = "mayday-" + getX() + "," + getY();
             for (int i=0 ; i<Planet.nbagents ; i++) {
@@ -128,6 +127,7 @@ public class Rover extends Agent {
                 }
             }
         }
+        helpSended ++;
     }
 
 
