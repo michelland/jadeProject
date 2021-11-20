@@ -54,7 +54,7 @@ public class Rover extends Agent {
         desire = Desire.PROGRESS;
         intention = Intention.EXPLORING;
 
-        addBehaviour(new TickerBehaviour(this, 400) {
+        addBehaviour(new TickerBehaviour(this, 600) {
             @Override
             public void onTick() {
                 perception();
@@ -90,6 +90,12 @@ public class Rover extends Agent {
         }
         else if (beliefs.getStatus() == Status.RECHARGING) {
             content = "recharging: ";
+        }
+        else if (beliefs.getStatus() == Status.SAVING) {
+            content = "saving: ";
+        }
+        else if (beliefs.getStatus() == Status.ANALYSING) {
+            content = "analysing: ";
         }
         sendMessage(ACLMessage.INFORM, content, "Planet");
         //System.out.println(getName() + " > je suis HS");
@@ -182,7 +188,7 @@ public class Rover extends Agent {
 
     /************************************** ANALYSING ****************************************/
     public void analysing() {
-        beliefs.setStatus(Status.RUNNING);
+        beliefs.setStatus(Status.ANALYSING);
         if (batteryRemaining()) {
             int number_of_sample = beliefs.getNb_sample();
             if (number_of_sample >= Planet.numberOfSampleNecessaryForAnalysis) {
@@ -238,7 +244,7 @@ public class Rover extends Agent {
 
     /************************************** SAVING *******************************************/
     public void save() {
-        beliefs.setStatus(Status.RUNNING);
+        beliefs.setStatus(Status.SAVING);
         if (batteryRemaining() && nextToMayday()) {
             beliefs.setHelpingSended(true);
             String content = "save- ";

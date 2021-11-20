@@ -22,9 +22,11 @@ public class App extends Application {
 
 
     protected GridPane grid = new GridPane();
-    protected ImageView[] roverIcons = new ImageView[Planet.nbagents];
-    protected ImageView[] hsroverIcons = new ImageView[Planet.nbagents];
-    protected ImageView[] rechargeroverIcons = new ImageView[Planet.nbagents];
+    protected ImageView[] exploringIcons = new ImageView[Planet.nbagents];
+    protected ImageView[] hsIcons = new ImageView[Planet.nbagents];
+    protected ImageView[] rechargingIcons = new ImageView[Planet.nbagents];
+    protected ImageView[] savingIcons = new ImageView[Planet.nbagents];
+    protected ImageView[] analysingIcons = new ImageView[Planet.nbagents];
     Color colNight = new Color(0.25,0,0.9,1.0);
     Color colDay = new Color(0.82,0.26,0.07,1.0);
     public boolean currentDayLightState = Planet.dayLight;
@@ -107,19 +109,27 @@ public class App extends Application {
             State state = Planet.states.get(i);
             int x = state.getX();
             int y = state.getY();
-            grid.getChildren().remove(roverIcons[i]);
-            grid.getChildren().remove(hsroverIcons[i]);
-            grid.getChildren().remove(rechargeroverIcons[i]);
+            grid.getChildren().remove(exploringIcons[i]);
+            grid.getChildren().remove(hsIcons[i]);
+            grid.getChildren().remove(rechargingIcons[i]);
+            grid.getChildren().remove(savingIcons[i]);
+            grid.getChildren().remove(analysingIcons[i]);
 
             Status status = Planet.states.get(i).getStatus();
             if (status.equals(Status.RUNNING)) {
-                grid.add(roverIcons[i], y, x+1, 1,1);
+                grid.add(exploringIcons[i], y, x+1, 1,1);
             }
             else if (status.equals(Status.HS)) {
-                grid.add(hsroverIcons[i], y, x+1, 1,1);
+                grid.add(hsIcons[i], y, x+1, 1,1);
             }
             else if (status.equals(Status.RECHARGING)) {
-                grid.add(rechargeroverIcons[i], y, x+1, 1,1);
+                grid.add(rechargingIcons[i], y, x+1, 1,1);
+            }
+            else if (status.equals(Status.SAVING)) {
+                grid.add(savingIcons[i], y, x+1, 1,1);
+            }
+            else if (status.equals(Status.ANALYSING)) {
+                grid.add(analysingIcons[i], y, x+1,1,1);
             }
 //            if (Planet.states.get(i).isHS()) {
 //                grid.add(hsroverIcons[i], y, x+1, 1,1);
@@ -145,39 +155,59 @@ public class App extends Application {
 
         for (int i=0 ; i<Planet.nbagents ; i++) {
             if (Planet.nbagents <= 6) {
-                roverIcons[i] = new ImageView("assets/rover" + i + ".png");
-                hsroverIcons[i] = new ImageView("assets/hsrover" + i + ".png");
-                rechargeroverIcons[i] = new ImageView("assets/rechargerover" + i + ".png");
+                exploringIcons[i] = new ImageView("assets/exploring/rover" + i + ".png");
+                hsIcons[i] = new ImageView("assets/hs/rover" + i + ".png");
+                rechargingIcons[i] = new ImageView("assets/recharging/rover" + i + ".png");
+                savingIcons[i] = new ImageView("assets/saving/rover" + i + ".png");
+                analysingIcons[i] = new ImageView("assets/analysing/rover" + i + ".png");
             }
             else {
-                roverIcons[i] = new ImageView("assets/rover0.png");
-                hsroverIcons[i] = new ImageView("assets/hsrover0.png");
-                rechargeroverIcons[i] = new ImageView("assets/rechargerover0.png");
+                exploringIcons[i] = new ImageView("assets/exploring/rover0.png");
+                hsIcons[i] = new ImageView("assets/hs/rover0.png");
+                rechargingIcons[i] = new ImageView("assets/recharging/rover0.png");
+                savingIcons[i] = new ImageView("assets/saving/rover0.png");
+                analysingIcons[i] = new ImageView("assets/analysing/rover0.png");
             }
-            roverIcons[i].setPreserveRatio(true);
-            roverIcons[i].setFitWidth(len_square);
-            roverIcons[i].setFitHeight(len_square);
+            exploringIcons[i].setPreserveRatio(true);
+            exploringIcons[i].setFitWidth(len_square);
+            exploringIcons[i].setFitHeight(len_square);
 
-            hsroverIcons[i].setPreserveRatio(true);
-            hsroverIcons[i].setFitWidth(len_square);
-            hsroverIcons[i].setFitHeight(len_square);
+            hsIcons[i].setPreserveRatio(true);
+            hsIcons[i].setFitWidth(len_square);
+            hsIcons[i].setFitHeight(len_square);
 
-            rechargeroverIcons[i].setPreserveRatio(true);
-            rechargeroverIcons[i].setFitWidth(len_square);
-            rechargeroverIcons[i].setFitHeight(len_square);
+            rechargingIcons[i].setPreserveRatio(true);
+            rechargingIcons[i].setFitWidth(len_square);
+            rechargingIcons[i].setFitHeight(len_square);
+
+            savingIcons[i].setPreserveRatio(true);
+            savingIcons[i].setFitWidth(len_square);
+            savingIcons[i].setFitHeight(len_square);
+
+            analysingIcons[i].setPreserveRatio(true);
+            analysingIcons[i].setFitWidth(len_square);
+            analysingIcons[i].setFitHeight(len_square);
+
+
 
             int x = Planet.states.get(i).getX();
             int y = Planet.states.get(i).getY();
 
             Status status = Planet.states.get(i).getStatus();
             if (status.equals(Status.RUNNING)) {
-                grid.add(roverIcons[i], y, x+1, 1,1);
+                grid.add(exploringIcons[i], y, x+1, 1,1);
             }
             else if (status.equals(Status.HS)) {
-                grid.add(hsroverIcons[i], y, x+1, 1,1);
+                grid.add(hsIcons[i], y, x+1, 1,1);
             }
             else if (status.equals(Status.RECHARGING)) {
-                grid.add(rechargeroverIcons[i], y, x+1, 1,1);
+                grid.add(rechargingIcons[i], y, x+1, 1,1);
+            }
+            else if (status.equals(Status.SAVING)) {
+                grid.add(savingIcons[i], y, x+1, 1,1);
+            }
+            else if (status.equals(Status.ANALYSING)) {
+                grid.add(analysingIcons[i], y, x+1, 1,1);
             }
 //            if (Planet.states.get(i).isHS()) {
 //                grid.add(hsroverIcons[i], y, x+1, 1,1);

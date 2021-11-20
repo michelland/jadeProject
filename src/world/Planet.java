@@ -18,7 +18,7 @@ import java.util.Map;
 public class Planet extends Agent {
 
     /************************* PARAMATERS ***************************/
-    public static final int SIZE = 20;
+    public static final int SIZE = 10;
     public static final float CRATER_RATE = 0.05f;
     public static final float SAMPLE_RATE = 0.3f;
 
@@ -87,6 +87,12 @@ public class Planet extends Agent {
                             break;
                         case "recharging":
                             states.get(sender).setStatus(Status.RECHARGING);
+                            break;
+                        case "saving":
+                            states.get(sender).setStatus(Status.SAVING);
+                            break;
+                        case "analysing":
+                            states.get(sender).setStatus(Status.ANALYSING);
                             break;
                     }
                 }
