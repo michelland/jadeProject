@@ -11,7 +11,7 @@ public class Plans {
 
             switch (intention) {
                 case GATHERING:
-                    System.out.println(rover.getLocalName() + " > GATHERING, I have " + rover.getNb_sample() + " samples");
+                    //System.out.println(rover.getLocalName() + " > GATHERING, I have " + rover.getNb_sample() + " samples");
                     rover.gather();
                     break;
                 case EXPLORING:
@@ -19,11 +19,11 @@ public class Plans {
                     rover.moveRandom();
                     break;
                 case ANALYSING:
-                    System.out.println(rover.getLocalName() + " > ANALYSING");
+                    //System.out.println(rover.getLocalName() + " > ANALYSING");
                     rover.analysing();
                     break;
                 case RECHARGING:
-                    System.out.println(rover.getLocalName() + " > RECHARGING");
+                    //System.out.println(rover.getLocalName() + " > RECHARGING");
                     rover.recharge();
                     break;
                 case REACHING:
@@ -31,7 +31,7 @@ public class Plans {
                     rover.moveToMayday();
                     break;
                 case SAVING:
-                    System.out.println(rover.getLocalName() + " > SAVING");
+                    //System.out.println(rover.getLocalName() + " > SAVING");
                     rover.save();
                     break;
                 case MAYDAY:

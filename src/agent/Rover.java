@@ -54,7 +54,7 @@ public class Rover extends Agent {
         desire = Desire.PROGRESS;
         intention = Intention.EXPLORING;
 
-        addBehaviour(new TickerBehaviour(this, 600) {
+        addBehaviour(new TickerBehaviour(this, Planet.timerTick) {
             @Override
             public void onTick() {
                 perception();
@@ -162,7 +162,7 @@ public class Rover extends Agent {
                 beliefs.setY_mayday(y);
             }
             else if (type.equals("save")) {
-                System.out.println(getLocalName() + " > " + "Je suis sauf");
+                //System.out.println(getLocalName() + " > " + "Je suis sauf");
                 beliefs.setStatus(Status.RUNNING);
                 beliefs.setMaydaySendedTimer(0);
                 beliefs.setIdHelping("");
@@ -180,6 +180,8 @@ public class Rover extends Agent {
             }
         }
     }
+
+
 
     /************************************** EXPLORING ***************************************/
     public void moveRandom() {
@@ -224,9 +226,9 @@ public class Rover extends Agent {
             int number_of_sample = beliefs.getNb_sample();
             if (number_of_sample >= Planet.numberOfSampleNecessaryForAnalysis) {
                 beliefs.setNb_sample(number_of_sample - Planet.numberOfSampleNecessaryForAnalysis);
-                System.out.println(getLocalName() + " > " + "Analyse complète !");
+                //System.out.println(getLocalName() + " > " + "Analyse complète !");
             } else {
-                System.out.println(getLocalName() + " > " + "Analyse échouée");
+                //System.out.println(getLocalName() + " > " + "Analyse échouée");
             }
             decharge();
         }
@@ -234,6 +236,7 @@ public class Rover extends Agent {
 
     /************************************** RECHARGING ***************************************/
     public void recharge() {
+
         beliefs.setStatus(Status.RECHARGING);
         if (Planet.dayLight) {
             int percentage = beliefs.getBattery_pourcentage();
@@ -252,7 +255,7 @@ public class Rover extends Agent {
         if (!beliefs.isHelpingSended()) {
             String content = "helping- ";
             sendMessage(ACLMessage.INFORM, content, beliefs.getIdMayday());
-            System.out.println(getLocalName() + " > " + "Helping " + beliefs.getIdMayday());
+            System.out.println(getLocalName() + " > " + beliefs.getIdMayday() + " " + content);
             beliefs.setHelpingSended(true);
         }
         int diffX = getX() - getBeliefs().getX_mayday();
@@ -282,15 +285,15 @@ public class Rover extends Agent {
             sendMessage(ACLMessage.INFORM, content, beliefs.getIdMayday());
             beliefs.setX_mayday(-1);
             beliefs.setY_mayday(-1);
-            System.out.println(getLocalName() + " > " + beliefs.getIdMayday() + " : " + "I'm saving you !");
+            System.out.println(getLocalName() + " > " + beliefs.getIdMayday() + " " + content);
         }
     }
 
     /************************************** MAYDAY *******************************************/
 
     public void sendMayday() {
+        addPositionToTabou(beliefs.getX(),beliefs.getY());
         if ((beliefs.getMaydaySendedTimer() % 10) == 0) {
-            addPositionToTabou(beliefs.getX(),beliefs.getY());
             String content = "mayday-" + getX() + "," + getY();
             for (int i=0 ; i<Planet.nbagents ; i++) {
                 if (i != Integer.parseInt(getLocalName())) {

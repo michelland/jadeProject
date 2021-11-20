@@ -31,6 +31,23 @@ public class Position {
         return ((x == p.x) && (y == p.y));
     }
 
+    public String toString() {
+        String res = "(";
+        res += x;
+        res += ",";
+        res += y;
+        res += ")";
+        return res;
+    }
+
+    public static String toString(Vector<Position> positions) {
+        String res = "[";
+        for (Position position : positions) {
+            res += position.toString();
+        }
+        res += "]";
+        return res;
+    }
     public boolean isIn(Vector<Position> positions) {
         for (Position p : positions) {
             if (this.equals(p)) {
@@ -45,8 +62,13 @@ public class Position {
     }
 
     public Vector<Position> goodPositions(Vector<Position> safe_positions, Vector<Position> visited) {
-        Vector<Position> positions = safe_positions;
-        positions.removeIf(p -> p.isIn(visited));
+
+        Vector<Position> positions = new Vector<>();
+        for (Position p : safe_positions) {
+            if (!p.isIn(visited)) {
+                positions.add(p);
+            }
+        }
         return positions;
     }
 

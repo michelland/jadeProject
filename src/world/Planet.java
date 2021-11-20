@@ -30,7 +30,7 @@ public class Planet extends Agent {
     public static int heure = 0;
     public static int heureNuit = 18;
     public static int heureJour = 0;
-    public static int timerTick = 1000;
+    public static int timerTick = 600;
     public static int nbagents = 3;
 
     /**************************** UI *****************************/
@@ -42,6 +42,7 @@ public class Planet extends Agent {
     public static final int dechargeEfficiency = 10;
     public static final int numberOfSampleNecessaryForAnalysis = 4;
     public static final int gatherVariance = 3;
+    public static final int greedLevel = 30;
     public static Map<Integer, State> states = new HashMap<Integer, State>();
 
     @Override

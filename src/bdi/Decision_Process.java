@@ -9,11 +9,14 @@ public class Decision_Process {
     }
 
     public static Intention option(Desire _d, Intention _i, Rover _r){
+        boolean cond1 = _r.getBattery_pourcentage() <= 10;
+        boolean cond2 = _r.getBattery_pourcentage() <= _r.getBeliefs().getGreedLevel();
+        boolean cond3 = (_r.getBeliefs().getTimeBeforeNight() <= 2) && (_r.getBeliefs().getTimeBeforeNight() >= 1);
         if(_d == Desire.PROGRESS){
             if(_r.isHS()){
                 return Intention.MAYDAY;
             }
-            if(_r.getBattery_pourcentage() <= 10){
+            if(cond1 || (cond2 && cond3)){
                 return Intention.RECHARGING;
             }
             if(_r.getCurrentType() == Type.SAMPLE){
@@ -30,7 +33,7 @@ public class Decision_Process {
             if(_r.isHS()){
                 return Intention.MAYDAY;
             }
-            if(_r.getBattery_pourcentage() <= 10){
+            if(cond1 || (cond2 && cond3)){
                 return Intention.RECHARGING;
             }
             if(_r.nextToMayday()){

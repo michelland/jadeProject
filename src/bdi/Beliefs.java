@@ -3,6 +3,7 @@ package bdi;
 import agent.Position;
 import agent.Status;
 import jade.lang.acl.ACLMessage;
+import world.Planet;
 import world.Type;
 
 import java.util.Vector;
@@ -25,6 +26,7 @@ public class Beliefs {
     protected Type currentType;
     protected int maydaySendedTimer = 0;
     protected boolean helpingSended = false;
+    protected int greedLevel = Planet.greedLevel;
 
     public Beliefs(String name, int _x, int _y){
         setName(name);
@@ -33,12 +35,25 @@ public class Beliefs {
         status = Status.RUNNING;
     }
 
+    protected int getGreedLevel() {
+        return greedLevel;
+    }
     public Vector<Position> getVisited() {
         return visited;
     }
     public Vector<Position> getTabou() {
         return tabou;
     }
+
+    public int getTimeBeforeNight() {
+        if (Planet.heureNuit <= getHeure()) {
+            return 0;
+        }
+        else {
+            return Planet.heureNuit - getHeure();
+        }
+    }
+
     public boolean isHelpingSended() {
         return helpingSended;
     }
