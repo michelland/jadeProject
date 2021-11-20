@@ -122,6 +122,20 @@ public class Rover extends Agent {
         }
     }
 
+    public void addPositionToTabou(int x, int y) {
+        Position p = new Position(x,y);
+        if (!p.isIn(beliefs.getTabou())) {
+            beliefs.getTabou().add(p);
+        }
+    }
+
+    public void addCurrentPositionToVisited() {
+        Position p = new Position(beliefs.getX(), beliefs.getY());
+        if (!p.isIn(beliefs.getVisited())) {
+            beliefs.getVisited().add(p);
+        }
+    }
+
     /************************************** PERCEPTION ***************************************/
     public void perception() {
         beliefs.setCurrentType(Planet.terrain.getType(getX(), getY()));
@@ -140,9 +154,12 @@ public class Rover extends Agent {
             String content = parsed_message[1];
             if (type.equals("mayday")) {
                 String[] coordinates = content.split(",");
+                int x = Integer.parseInt(coordinates[0]);
+                int y = Integer.parseInt(coordinates[1]);
+                addPositionToTabou(x,y);
                 beliefs.setIdMayday(msg.getSender().getLocalName());
-                beliefs.setX_mayday(Integer.parseInt(coordinates[0]));
-                beliefs.setY_mayday(Integer.parseInt(coordinates[1]));
+                beliefs.setX_mayday(x);
+                beliefs.setY_mayday(y);
             }
             else if (type.equals("save")) {
                 System.out.println(getLocalName() + " > " + "Je suis sauf");
@@ -168,9 +185,23 @@ public class Rover extends Agent {
     public void moveRandom() {
         beliefs.setStatus(Status.RUNNING);
         Position current = new Position(getX(), getY());
-        Vector<Position> possible_positions = current.legalPositions();
-        int index = (int) (Math.random() * (possible_positions.size()));
-        move(possible_positions.get(index).x, possible_positions.get(index).y);
+        addCurrentPositionToVisited();
+        Vector<Position> legal_positions = current.legalPositions();
+        Vector<Position> safe_positions = current.safePositions(beliefs.getTabou());
+        Vector<Position> good_positions = current.goodPositions(safe_positions, beliefs.getVisited());
+        int index;
+        if (!good_positions.isEmpty()) {
+            index = (int) (Math.random() * (good_positions.size()));
+            move(good_positions.get(index).x, good_positions.get(index).y);
+        }
+        else if (!safe_positions.isEmpty()) {
+            index = (int) (Math.random() * (safe_positions.size()));
+            move(safe_positions.get(index).x, safe_positions.get(index).y);
+        }
+        else {
+            index = (int) (Math.random() * (legal_positions.size()));
+            move(legal_positions.get(index).x, legal_positions.get(index).y);
+        }
     }
 
     /************************************** GATHERING ****************************************/
@@ -259,6 +290,7 @@ public class Rover extends Agent {
 
     public void sendMayday() {
         if ((beliefs.getMaydaySendedTimer() % 10) == 0) {
+            addPositionToTabou(beliefs.getX(),beliefs.getY());
             String content = "mayday-" + getX() + "," + getY();
             for (int i=0 ; i<Planet.nbagents ; i++) {
                 if (i != Integer.parseInt(getLocalName())) {

@@ -1,8 +1,11 @@
 package bdi;
 
+import agent.Position;
 import agent.Status;
 import jade.lang.acl.ACLMessage;
 import world.Type;
+
+import java.util.Vector;
 
 public class Beliefs {
     protected String name;
@@ -16,6 +19,8 @@ public class Beliefs {
     protected int x_mayday = -1;
     protected int y;
     protected int y_mayday = -1;
+    protected Vector<Position> tabou = new Vector<>();
+    protected Vector<Position> visited = new Vector<>();
     protected Status status;
     protected Type currentType;
     protected int maydaySendedTimer = 0;
@@ -28,6 +33,12 @@ public class Beliefs {
         status = Status.RUNNING;
     }
 
+    public Vector<Position> getVisited() {
+        return visited;
+    }
+    public Vector<Position> getTabou() {
+        return tabou;
+    }
     public boolean isHelpingSended() {
         return helpingSended;
     }

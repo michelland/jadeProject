@@ -1,5 +1,6 @@
 package world;
 
+import agent.Position;
 import agent.Rover;
 import agent.State;
 import agent.Status;
@@ -13,6 +14,7 @@ import jade.lang.acl.ACLMessage;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 
 public class Planet extends Agent {
@@ -45,6 +47,13 @@ public class Planet extends Agent {
     @Override
     protected void setup() {
         terrain = new Terrain(SIZE, CRATER_RATE, SAMPLE_RATE);
+//        Vector<Position> tabou = new Vector<Position>();
+//        tabou.add(new Position(1,2));
+//        tabou.add(new Position(2,3));
+//        tabou.add(new Position(4,1));
+//        tabou.add(new Position(5,5));
+//        Position position = new Position(1,4);
+//        System.out.println("resultat test " + position.isIn(tabou));
         for (int i=0 ; i<nbagents ; i++) {
             states.put(i, new State(0,0));
         }
